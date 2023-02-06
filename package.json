@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pre-commit": "lint-staged --no-stash"
   },
   "dependencies": {
     "@graphql-codegen/cli": "^3.0.0",
