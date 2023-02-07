@@ -7,10 +7,14 @@ import Layout from '@components/Atoms/Layout/Layout'
 import Container from '@components/Atoms/Container/Container'
 import Spacer from '@components/Atoms/Spacer'
 import CardWithIcon from '@components/Blocks/Cards/CardWithIcon'
+import { useRecoilValue } from 'recoil'
+import { stateUserInfo } from 'src/stores/stateUserInfo'
 
 interface HomeProps {}
 
 const Home = ({}: HomeProps) => {
+  const userInfo = useRecoilValue(stateUserInfo)
+
   return (
     <Layout>
       <Head>
@@ -21,7 +25,7 @@ const Home = ({}: HomeProps) => {
       <Container>
         <Spacer size={'h-6'} />
         <h4 className="text-2xl font-bold tracking-wide dark:text-white">
-          Hi 정훈 👋
+          Hi {userInfo?.name} 👋
         </h4>
         <Spacer size={'h-3'} />
         <p className="text-xl font-nanumBrush font-bold tracking-wide bg-lightgreen py-4 rounded-lg text-center">

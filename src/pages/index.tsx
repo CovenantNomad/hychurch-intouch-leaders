@@ -9,8 +9,7 @@ import graphlqlRequestClient from 'src/client/graphqlRequestClient'
 // components
 import { INTOUCH_LEADERS_ACCESS_TOKEN } from 'src/constants/constants'
 import Spinner from '@components/Atoms/Spinner'
-import { graphQLClient } from './_app'
-import { setCookie } from 'src/utils/cookieUtil'
+import graphQLClient from 'src/client/graphQLClient'
 
 export default function Login() {
   const router = useRouter()
@@ -18,7 +17,6 @@ export default function Login() {
     onSuccess: (data) => {
       const userInfo = JSON.stringify({ accessToken: data.login.accessToken })
       localStorage.setItem(INTOUCH_LEADERS_ACCESS_TOKEN, userInfo)
-      setCookie('accessToken', userInfo, 30)
       graphlqlRequestClient.setHeader('authorization', data.login.accessToken)
       graphQLClient.setHeader('authorization', data.login.accessToken)
       router.push('/home')
