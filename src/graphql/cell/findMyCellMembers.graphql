@@ -1,0 +1,17 @@
+query findMyCellMembers {
+  myCellMembers {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
