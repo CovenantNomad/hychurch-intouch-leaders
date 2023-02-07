@@ -1,0 +1,11 @@
+query me {
+  me {
+    id
+    name
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}

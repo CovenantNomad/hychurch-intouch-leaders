@@ -1,5 +1,6 @@
 schema: https://hychurch-dev.duckdns.org:3000/graphql
-documents: './src/graphql/**/*.graphql'
+documents: './src/graphql/**/*.ts'
+ignoreNoDocuments: true,
 generates:
   ./src/graphql/generated.ts:
     plugins:

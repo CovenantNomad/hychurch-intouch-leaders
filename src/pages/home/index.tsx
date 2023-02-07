@@ -20,7 +20,9 @@ const Home = ({}: HomeProps) => {
 
       <Container>
         <Spacer size={'h-6'} />
-        <h4 className="text-2xl font-bold tracking-wide">Hi 정훈 👋</h4>
+        <h4 className="text-2xl font-bold tracking-wide dark:text-white">
+          Hi 정훈 👋
+        </h4>
         <Spacer size={'h-3'} />
         <p className="text-xl font-nanumBrush font-bold tracking-wide bg-lightgreen py-4 rounded-lg text-center">
           <span className="block font-poppins text-xs uppercase mb-1">
@@ -49,5 +51,24 @@ const Home = ({}: HomeProps) => {
     </Layout>
   )
 }
+
+// export async function getServerSideProps() {
+//   const getMe = gql`
+//     query me {
+//       me {
+//         id
+//         name
+//         roles
+//         cell {
+//           id
+//           name
+//         }
+//       }
+//     }
+//   `
+//   const posts = await graphQLClient.request(getMe)
+//   console.log(posts)
+//   return { props: { posts } }
+// }
 
 export default Home

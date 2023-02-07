@@ -1,5 +1,11 @@
 import { GraphQLClient } from 'graphql-request'
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { RequestInit } from 'graphql-request/dist/types.dom'
+import {
+  useMutation,
+  useQuery,
+  UseMutationOptions,
+  UseQueryOptions,
+} from '@tanstack/react-query'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -459,6 +465,74 @@ export type LoginMutation = {
   login: { __typename?: 'LoginPayload'; accessToken: string }
 }
 
+export type MeQueryVariables = Exact<{ [key: string]: never }>
+
+export type MeQuery = {
+  __typename?: 'Query'
+  me: {
+    __typename?: 'User'
+    id: string
+    name: string
+    roles: Array<RoleType>
+    cell?: { __typename?: 'Cell'; id: string; name: string } | null
+  }
+}
+
+export type FindCellQueryVariables = Exact<{
+  id: Scalars['Float']
+}>
+
+export type FindCellQuery = {
+  __typename?: 'Query'
+  findCell: {
+    __typename?: 'Cell'
+    id: string
+    name: string
+    leaders: Array<{
+      __typename?: 'User'
+      id: string
+      name: string
+      roles: Array<RoleType>
+    }>
+    members: Array<{
+      __typename?: 'User'
+      id: string
+      name: string
+      phone: string
+      isActive: boolean
+      birthday?: string | null
+      gender?: Gender | null
+      address?: string | null
+      roles: Array<RoleType>
+      cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    }>
+    statistics: {
+      __typename?: 'StatisticsOfCell'
+      totalCountOfMembers: number
+      countOfActiveMembers: number
+    }
+  }
+}
+
+export type FindMyCellMembersQueryVariables = Exact<{ [key: string]: never }>
+
+export type FindMyCellMembersQuery = {
+  __typename?: 'Query'
+  myCellMembers?: Array<{
+    __typename?: 'User'
+    id: string
+    name: string
+    phone: string
+    isActive: boolean
+    birthday?: string | null
+    gender?: Gender | null
+    address?: string | null
+    description?: string | null
+    roles: Array<RoleType>
+    cell?: { __typename?: 'Cell'; id: string; name: string } | null
+  }> | null
+}
+
 export const LoginDocument = `
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -488,3 +562,130 @@ export const useLoginMutation = <TError = unknown, TContext = unknown>(
     options
   )
 useLoginMutation.getKey = () => ['login']
+
+export const MeDocument = `
+    query me {
+  me {
+    id
+    name
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
+    `
+export const useMeQuery = <TData = MeQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables?: MeQueryVariables,
+  options?: UseQueryOptions<MeQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<MeQuery, TError, TData>(
+    variables === undefined ? ['me'] : ['me', variables],
+    fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers),
+    options
+  )
+
+useMeQuery.getKey = (variables?: MeQueryVariables) =>
+  variables === undefined ? ['me'] : ['me', variables]
+export const FindCellDocument = `
+    query findCell($id: Float!) {
+  findCell(id: $id) {
+    id
+    name
+    leaders {
+      id
+      name
+      roles
+    }
+    members {
+      id
+      name
+      phone
+      isActive
+      birthday
+      gender
+      address
+      cell {
+        id
+        name
+      }
+      roles
+    }
+    statistics {
+      totalCountOfMembers
+      countOfActiveMembers
+    }
+  }
+}
+    `
+export const useFindCellQuery = <TData = FindCellQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: FindCellQueryVariables,
+  options?: UseQueryOptions<FindCellQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindCellQuery, TError, TData>(
+    ['findCell', variables],
+    fetcher<FindCellQuery, FindCellQueryVariables>(
+      client,
+      FindCellDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindCellQuery.getKey = (variables: FindCellQueryVariables) => [
+  'findCell',
+  variables,
+]
+export const FindMyCellMembersDocument = `
+    query findMyCellMembers {
+  myCellMembers {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
+    `
+export const useFindMyCellMembersQuery = <
+  TData = FindMyCellMembersQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: FindMyCellMembersQueryVariables,
+  options?: UseQueryOptions<FindMyCellMembersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindMyCellMembersQuery, TError, TData>(
+    variables === undefined
+      ? ['findMyCellMembers']
+      : ['findMyCellMembers', variables],
+    fetcher<FindMyCellMembersQuery, FindMyCellMembersQueryVariables>(
+      client,
+      FindMyCellMembersDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindMyCellMembersQuery.getKey = (
+  variables?: FindMyCellMembersQueryVariables
+) =>
+  variables === undefined
+    ? ['findMyCellMembers']
+    : ['findMyCellMembers', variables]

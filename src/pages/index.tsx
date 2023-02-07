@@ -1,24 +1,26 @@
 import Head from 'next/head'
-import { GraphQLError } from 'graphql'
 import { useRouter } from 'next/router'
+import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { LoginForm } from 'src/types/auth'
-import { toast } from 'react-hot-toast'
-import Spinner from '@components/Atoms/Spinner'
+import { GraphQLError } from 'graphql'
 import { useLoginMutation } from 'src/graphql/generated'
 import graphlqlRequestClient from 'src/client/graphqlRequestClient'
+// components
 import { INTOUCH_LEADERS_ACCESS_TOKEN } from 'src/constants/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import Spinner from '@components/Atoms/Spinner'
+import { graphQLClient } from './_app'
+import { setCookie } from 'src/utils/cookieUtil'
 
 export default function Login() {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { mutate, isLoading } = useLoginMutation(graphlqlRequestClient, {
     onSuccess: (data) => {
       const userInfo = JSON.stringify({ accessToken: data.login.accessToken })
       localStorage.setItem(INTOUCH_LEADERS_ACCESS_TOKEN, userInfo)
+      setCookie('accessToken', userInfo, 30)
       graphlqlRequestClient.setHeader('authorization', data.login.accessToken)
-      queryClient.invalidateQueries(['login'])
+      graphQLClient.setHeader('authorization', data.login.accessToken)
       router.push('/home')
     },
     onError(errors: GraphQLError) {
