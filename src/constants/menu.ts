@@ -1,30 +1,38 @@
-export const mainMenu = [
+export interface menuType {
+  id: number
+  title: string
+  icon: string
+  color: string
+  pathname: string
+}
+
+export const mainMenu: menuType[] = [
   {
     id: 0,
     title: '출석체크',
     icon: '⏱️',
-    color: 'bg-lightyellow',
+    color: '#FDF4E2',
     pathname: '/attendance',
   },
   {
     id: 1,
     title: '셀보고서',
     icon: '📝',
-    color: 'bg-lightteal',
+    color: '#EDF5E1',
     pathname: '/reports',
   },
   {
     id: 2,
     title: '셀원관리',
     icon: '⛪️',
-    color: 'bg-lightblue',
+    color: '#CAEAF3',
     pathname: '/cell',
   },
   {
     id: 3,
     title: '계정설정',
     icon: '⚙️',
-    color: 'bg-lightred',
+    color: '#F9E8E5',
     pathname: '/setting',
   },
 ]
@@ -37,7 +45,7 @@ export const cellMenu = [
   },
   {
     id: 1,
-    title: '셀원 리스트',
+    title: '셀원 정보',
     icon: '🗃️',
   },
   {

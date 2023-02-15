@@ -11,7 +11,8 @@ interface CardWithIconProps {
 const CardWithIcon = ({ bg, icon, title }: CardWithIconProps) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center py-12 rounded-3xl ${bg}`}
+      className={`flex flex-col items-center justify-center py-12 rounded-3xl`}
+      style={{ backgroundColor: bg }}
     >
       <div className="w-12 h-12 bg-white flex justify-center items-center rounded-full">
         <span className="text-xl">{icon}</span>

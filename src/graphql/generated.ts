@@ -533,6 +533,57 @@ export type FindMyCellMembersQuery = {
   }> | null
 }
 
+export type FindUsersQueryVariables = Exact<{
+  name?: InputMaybe<Scalars['String']>
+  limit?: InputMaybe<Scalars['Int']>
+  offset?: InputMaybe<Scalars['Int']>
+}>
+
+export type FindUsersQuery = {
+  __typename?: 'Query'
+  findUsers: {
+    __typename?: 'FindUsersPayload'
+    totalCount: number
+    nodes: Array<{
+      __typename?: 'User'
+      id: string
+      name: string
+      phone: string
+      isActive: boolean
+      birthday?: string | null
+      gender?: Gender | null
+      address?: string | null
+      description?: string | null
+      roles: Array<RoleType>
+      cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    }>
+  }
+}
+
+export type UpdateUserMutationVariables = Exact<{
+  input: UpdateUserInput
+}>
+
+export type UpdateUserMutation = {
+  __typename?: 'Mutation'
+  updateUser: {
+    __typename?: 'UpdateUserPayload'
+    user: {
+      __typename?: 'User'
+      id: string
+      name: string
+      phone: string
+      isActive: boolean
+      birthday?: string | null
+      gender?: Gender | null
+      address?: string | null
+      roles: Array<RoleType>
+      description?: string | null
+      cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    }
+  }
+}
+
 export const LoginDocument = `
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -689,3 +740,92 @@ useFindMyCellMembersQuery.getKey = (
   variables === undefined
     ? ['findMyCellMembers']
     : ['findMyCellMembers', variables]
+export const FindUsersDocument = `
+    query findUsers($name: String, $limit: Int, $offset: Int) {
+  findUsers(name: $name, limit: $limit, offset: $offset) {
+    totalCount
+    nodes {
+      id
+      name
+      phone
+      isActive
+      birthday
+      gender
+      address
+      description
+      roles
+      cell {
+        id
+        name
+      }
+    }
+  }
+}
+    `
+export const useFindUsersQuery = <TData = FindUsersQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables?: FindUsersQueryVariables,
+  options?: UseQueryOptions<FindUsersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindUsersQuery, TError, TData>(
+    variables === undefined ? ['findUsers'] : ['findUsers', variables],
+    fetcher<FindUsersQuery, FindUsersQueryVariables>(
+      client,
+      FindUsersDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindUsersQuery.getKey = (variables?: FindUsersQueryVariables) =>
+  variables === undefined ? ['findUsers'] : ['findUsers', variables]
+export const UpdateUserDocument = `
+    mutation updateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    user {
+      id
+      name
+      phone
+      isActive
+      birthday
+      gender
+      address
+      cell {
+        id
+        name
+      }
+      roles
+      description
+    }
+  }
+}
+    `
+export const useUpdateUserMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    UpdateUserMutation,
+    TError,
+    UpdateUserMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    UpdateUserMutation,
+    TError,
+    UpdateUserMutationVariables,
+    TContext
+  >(
+    ['updateUser'],
+    (variables?: UpdateUserMutationVariables) =>
+      fetcher<UpdateUserMutation, UpdateUserMutationVariables>(
+        client,
+        UpdateUserDocument,
+        variables,
+        headers
+      )(),
+    options
+  )
+useUpdateUserMutation.getKey = () => ['updateUser']

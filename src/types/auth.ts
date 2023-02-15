@@ -1,4 +1,4 @@
-import { RoleType } from 'src/graphql/generated'
+import { RoleType } from '@/graphql/generated'
 
 export interface LoginForm {
   phone: string

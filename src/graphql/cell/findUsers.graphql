@@ -1,0 +1,20 @@
+query findUsers($name: String, $limit: Int, $offset: Int) {
+  findUsers(name: $name, limit: $limit, offset: $offset) {
+    totalCount
+    nodes {
+      id
+      name
+      phone
+      isActive
+      birthday
+      gender
+      address
+      description
+      roles
+      cell {
+        id
+        name
+      }
+    }
+  }
+}

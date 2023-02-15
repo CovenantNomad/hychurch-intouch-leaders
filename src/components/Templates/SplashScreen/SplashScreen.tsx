@@ -1,12 +1,11 @@
-import Container from '@components/Atoms/Container/Container'
-import Layout from '@components/Atoms/Layout/Layout'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { useSetRecoilState } from 'recoil'
-import graphlqlRequestClient from 'src/client/graphqlRequestClient'
-import { INTOUCH_LEADERS_ACCESS_TOKEN } from 'src/constants/constants'
-import { useMeQuery, MeDocument } from 'src/graphql/generated'
-import { stateUserInfo } from 'src/stores/stateUserInfo'
+import { useAuth } from '@/hooks/useAuth'
+import { INTOUCH_LEADERS_ACCESS_TOKEN } from '@/constants/constants'
+import Layout from '@components/Atoms/Layout/Layout'
+import Container from '@components/Atoms/Container/Container'
+import graphlqlRequestClient from '@/client/graphqlRequestClient'
+import { MeDocument } from '@/graphql/generated'
 
 interface SplashScreenProps {
   onFinished: () => void
@@ -14,12 +13,7 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onFinished }: SplashScreenProps) => {
   const router = useRouter()
-  const setUserInfo = useSetRecoilState(stateUserInfo)
-
-  const getMe = async () => {
-    const response = await graphlqlRequestClient.request(MeDocument)
-    return response
-  }
+  const { setUserInfo } = useAuth()
 
   const init = async () => {
     try {
@@ -28,7 +22,7 @@ const SplashScreen = ({ onFinished }: SplashScreenProps) => {
         console.log('refresh')
         const userInfo = JSON.parse(token)
         graphlqlRequestClient.setHeader('authorization', userInfo.accessToken)
-        const result = await getMe()
+        const result = await graphlqlRequestClient.request(MeDocument)
         if (result !== undefined) {
           setUserInfo({
             id: result.me.id,
