@@ -3,7 +3,6 @@ import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import Spacer from '@/components/Atoms/Spacer'
 import Spinner from '@/components/Atoms/Spinner'
 import SectionTitle from '@/components/Atoms/Typography/SectionTitle'
-import ListItem from '@/components/Blocks/ListItems/ListItem'
 import CellMemberListItem from '@/components/Organisms/Cell/CellMemberListItem'
 import {
   FindMyCellMembersQuery,
