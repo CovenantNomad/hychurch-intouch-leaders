@@ -1,0 +1,19 @@
+mutation updateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    user {
+      id
+      name
+      phone
+      isActive
+      birthday
+      gender
+      address
+      cell {
+        id
+        name
+      }
+      roles
+      description
+    }
+  }
+}

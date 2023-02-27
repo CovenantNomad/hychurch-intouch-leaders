@@ -8,7 +8,7 @@ interface HamburgerMenuProps {
 const HamburgerMenu = ({ isOpen, setIsOpen }: HamburgerMenuProps) => {
   return (
     <div
-      className={`${isOpen && 'delay-75 rotate-45'}`}
+      className={`${isOpen && 'delay-75 rotate-45'} cursor-pointer`}
       onClick={() => setIsOpen(!isOpen)}
     >
       <span

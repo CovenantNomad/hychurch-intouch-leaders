@@ -11,7 +11,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div>
       <Navbar />
       <Sidebar />
-      <main className="lg:ml-60 bg-[#fff] dark:bg-[#222]">{children}</main>
+      <main className="lg:ml-60 bg-[#fff]">{children}</main>
     </div>
   )
 }

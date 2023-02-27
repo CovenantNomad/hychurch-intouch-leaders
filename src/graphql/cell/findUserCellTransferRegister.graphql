@@ -1,0 +1,41 @@
+query findUserCellTransferRegister(
+  $limit: Int
+  $id: Float!
+  $transferOutStatus: [UserCellTransferStatus!]
+  $transferOutDateFilter: DateFilter
+) {
+  findCells(limit: $limit) {
+    nodes {
+      id
+      name
+    }
+  }
+  findCell(id: $id) {
+    members {
+      id
+      name
+      isActive
+      roles
+    }
+    transfersOut(
+      status: $transferOutStatus
+      orderDate: $transferOutDateFilter
+    ) {
+      id
+      status
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+  }
+}

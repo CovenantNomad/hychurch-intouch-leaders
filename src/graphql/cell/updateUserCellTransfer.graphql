@@ -1,0 +1,22 @@
+mutation updateUserCellTransfer($input: UpdateUserCellTransferInput!) {
+  updateUserCellTransfer(input: $input) {
+    userCellTransfer {
+      id
+      user {
+        id
+        name
+      }
+      status
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+      orderDate
+      completeDate
+    }
+  }
+}

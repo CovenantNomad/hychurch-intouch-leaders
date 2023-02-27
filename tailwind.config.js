@@ -18,6 +18,7 @@ module.exports = {
         lightred: '#F9E8E5',
         lightpurple: '#E6E3F5',
         lightgreen: '#E3F6F0',
+        primary: '#B0D1D4',
       },
     },
   },
