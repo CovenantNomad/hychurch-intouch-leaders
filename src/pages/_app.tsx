@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider enableSystem={true}>
+        <ThemeProvider enableSystem={false}>
           <RootApp>
             <Component {...pageProps} />
             <Toaster
