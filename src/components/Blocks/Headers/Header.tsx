@@ -20,14 +20,8 @@ const Header = ({
   const buttons = [
     {
       id: 0,
-      name: editMode ? '보기' : '편집',
+      name: editMode ? '보기' : '수정',
       onClick: () => setEditMode(!editMode),
-    },
-    {
-      id: 1,
-      name: '삭제',
-      onClick: () => console.log('삭제'),
-      outline: true,
     },
   ]
   return (

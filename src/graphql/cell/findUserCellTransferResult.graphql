@@ -1,0 +1,51 @@
+query findUserCellTransferResult(
+  $id: Float!
+  $transferInStatus: [UserCellTransferStatus!]
+  $transferOutStatus: [UserCellTransferStatus!]
+  $transferInDateFilter: DateFilter
+  $transferOutDateFilter: DateFilter
+) {
+  findCell(id: $id) {
+    transfersIn(status: $transferInStatus, orderDate: $transferInDateFilter) {
+      id
+      status
+      orderDate
+      completeDate
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+    transfersOut(
+      status: $transferOutStatus
+      orderDate: $transferOutDateFilter
+    ) {
+      id
+      status
+      orderDate
+      completeDate
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+  }
+}

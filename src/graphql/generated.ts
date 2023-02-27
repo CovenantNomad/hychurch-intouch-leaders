@@ -478,6 +478,18 @@ export type MeQuery = {
   }
 }
 
+export type CreateUserCellTransferMutationVariables = Exact<{
+  input: CreateUserCellTransferInput
+}>
+
+export type CreateUserCellTransferMutation = {
+  __typename?: 'Mutation'
+  createUserCellTransfer: {
+    __typename?: 'CreateUserCellTransferPayload'
+    success: boolean
+  }
+}
+
 export type FindCellQueryVariables = Exact<{
   id: Scalars['Float']
 }>
@@ -533,6 +545,125 @@ export type FindMyCellMembersQuery = {
   }> | null
 }
 
+export type FindUserCellTransferRegisterQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']>
+  id: Scalars['Float']
+  transferOutStatus?: InputMaybe<
+    Array<UserCellTransferStatus> | UserCellTransferStatus
+  >
+  transferOutDateFilter?: InputMaybe<DateFilter>
+}>
+
+export type FindUserCellTransferRegisterQuery = {
+  __typename?: 'Query'
+  findCells: {
+    __typename?: 'FindCellsPayload'
+    nodes: Array<{ __typename?: 'Cell'; id: string; name: string }>
+  }
+  findCell: {
+    __typename?: 'Cell'
+    members: Array<{
+      __typename?: 'User'
+      id: string
+      name: string
+      isActive: boolean
+      roles: Array<RoleType>
+    }>
+    transfersOut: Array<{
+      __typename?: 'UserCellTransfer'
+      id: string
+      status: UserCellTransferStatus
+      user: {
+        __typename?: 'User'
+        id: string
+        name: string
+        gender?: Gender | null
+      }
+      fromCell: { __typename?: 'Cell'; id: string; name: string }
+      toCell: { __typename?: 'Cell'; id: string; name: string }
+    }>
+  }
+}
+
+export type FindUserCellTransferRequestQueryVariables = Exact<{
+  id: Scalars['Float']
+  transferInStatus?: InputMaybe<
+    Array<UserCellTransferStatus> | UserCellTransferStatus
+  >
+  transferInDateFilter?: InputMaybe<DateFilter>
+}>
+
+export type FindUserCellTransferRequestQuery = {
+  __typename?: 'Query'
+  findCell: {
+    __typename?: 'Cell'
+    transfersIn: Array<{
+      __typename?: 'UserCellTransfer'
+      id: string
+      status: UserCellTransferStatus
+      orderDate: string
+      completeDate?: string | null
+      user: {
+        __typename?: 'User'
+        id: string
+        name: string
+        gender?: Gender | null
+      }
+      fromCell: { __typename?: 'Cell'; id: string; name: string }
+      toCell: { __typename?: 'Cell'; id: string; name: string }
+    }>
+  }
+}
+
+export type FindUserCellTransferResultQueryVariables = Exact<{
+  id: Scalars['Float']
+  transferInStatus?: InputMaybe<
+    Array<UserCellTransferStatus> | UserCellTransferStatus
+  >
+  transferOutStatus?: InputMaybe<
+    Array<UserCellTransferStatus> | UserCellTransferStatus
+  >
+  transferInDateFilter?: InputMaybe<DateFilter>
+  transferOutDateFilter?: InputMaybe<DateFilter>
+}>
+
+export type FindUserCellTransferResultQuery = {
+  __typename?: 'Query'
+  findCell: {
+    __typename?: 'Cell'
+    transfersIn: Array<{
+      __typename?: 'UserCellTransfer'
+      id: string
+      status: UserCellTransferStatus
+      orderDate: string
+      completeDate?: string | null
+      user: {
+        __typename?: 'User'
+        id: string
+        name: string
+        gender?: Gender | null
+      }
+      fromCell: { __typename?: 'Cell'; id: string; name: string }
+      toCell: { __typename?: 'Cell'; id: string; name: string }
+    }>
+    transfersOut: Array<{
+      __typename?: 'UserCellTransfer'
+      id: string
+      status: UserCellTransferStatus
+      orderDate: string
+      completeDate?: string | null
+      user: {
+        __typename?: 'User'
+        id: string
+        name: string
+        gender?: Gender | null
+      }
+      fromCell: { __typename?: 'Cell'; id: string; name: string }
+      toCell: { __typename?: 'Cell'; id: string; name: string }
+    }>
+  }
+}
+
 export type FindUsersQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']>
   limit?: InputMaybe<Scalars['Int']>
@@ -580,6 +711,27 @@ export type UpdateUserMutation = {
       roles: Array<RoleType>
       description?: string | null
       cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    }
+  }
+}
+
+export type UpdateUserCellTransferMutationVariables = Exact<{
+  input: UpdateUserCellTransferInput
+}>
+
+export type UpdateUserCellTransferMutation = {
+  __typename?: 'Mutation'
+  updateUserCellTransfer: {
+    __typename?: 'UpdateUserCellTransferPayload'
+    userCellTransfer: {
+      __typename?: 'UserCellTransfer'
+      id: string
+      status: UserCellTransferStatus
+      orderDate: string
+      completeDate?: string | null
+      user: { __typename?: 'User'; id: string; name: string }
+      fromCell: { __typename?: 'Cell'; id: string; name: string }
+      toCell: { __typename?: 'Cell'; id: string; name: string }
     }
   }
 }
@@ -641,6 +793,42 @@ export const useMeQuery = <TData = MeQuery, TError = unknown>(
 
 useMeQuery.getKey = (variables?: MeQueryVariables) =>
   variables === undefined ? ['me'] : ['me', variables]
+export const CreateUserCellTransferDocument = `
+    mutation createUserCellTransfer($input: CreateUserCellTransferInput!) {
+  createUserCellTransfer(input: $input) {
+    success
+  }
+}
+    `
+export const useCreateUserCellTransferMutation = <
+  TError = unknown,
+  TContext = unknown
+>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    CreateUserCellTransferMutation,
+    TError,
+    CreateUserCellTransferMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    CreateUserCellTransferMutation,
+    TError,
+    CreateUserCellTransferMutationVariables,
+    TContext
+  >(
+    ['createUserCellTransfer'],
+    (variables?: CreateUserCellTransferMutationVariables) =>
+      fetcher<
+        CreateUserCellTransferMutation,
+        CreateUserCellTransferMutationVariables
+      >(client, CreateUserCellTransferDocument, variables, headers)(),
+    options
+  )
+useCreateUserCellTransferMutation.getKey = () => ['createUserCellTransfer']
+
 export const FindCellDocument = `
     query findCell($id: Float!) {
   findCell(id: $id) {
@@ -740,6 +928,173 @@ useFindMyCellMembersQuery.getKey = (
   variables === undefined
     ? ['findMyCellMembers']
     : ['findMyCellMembers', variables]
+export const FindUserCellTransferRegisterDocument = `
+    query findUserCellTransferRegister($limit: Int, $id: Float!, $transferOutStatus: [UserCellTransferStatus!], $transferOutDateFilter: DateFilter) {
+  findCells(limit: $limit) {
+    nodes {
+      id
+      name
+    }
+  }
+  findCell(id: $id) {
+    members {
+      id
+      name
+      isActive
+      roles
+    }
+    transfersOut(status: $transferOutStatus, orderDate: $transferOutDateFilter) {
+      id
+      status
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+  }
+}
+    `
+export const useFindUserCellTransferRegisterQuery = <
+  TData = FindUserCellTransferRegisterQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindUserCellTransferRegisterQueryVariables,
+  options?: UseQueryOptions<FindUserCellTransferRegisterQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindUserCellTransferRegisterQuery, TError, TData>(
+    ['findUserCellTransferRegister', variables],
+    fetcher<
+      FindUserCellTransferRegisterQuery,
+      FindUserCellTransferRegisterQueryVariables
+    >(client, FindUserCellTransferRegisterDocument, variables, headers),
+    options
+  )
+
+useFindUserCellTransferRegisterQuery.getKey = (
+  variables: FindUserCellTransferRegisterQueryVariables
+) => ['findUserCellTransferRegister', variables]
+export const FindUserCellTransferRequestDocument = `
+    query findUserCellTransferRequest($id: Float!, $transferInStatus: [UserCellTransferStatus!], $transferInDateFilter: DateFilter) {
+  findCell(id: $id) {
+    transfersIn(status: $transferInStatus, orderDate: $transferInDateFilter) {
+      id
+      status
+      orderDate
+      completeDate
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+  }
+}
+    `
+export const useFindUserCellTransferRequestQuery = <
+  TData = FindUserCellTransferRequestQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindUserCellTransferRequestQueryVariables,
+  options?: UseQueryOptions<FindUserCellTransferRequestQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindUserCellTransferRequestQuery, TError, TData>(
+    ['findUserCellTransferRequest', variables],
+    fetcher<
+      FindUserCellTransferRequestQuery,
+      FindUserCellTransferRequestQueryVariables
+    >(client, FindUserCellTransferRequestDocument, variables, headers),
+    options
+  )
+
+useFindUserCellTransferRequestQuery.getKey = (
+  variables: FindUserCellTransferRequestQueryVariables
+) => ['findUserCellTransferRequest', variables]
+export const FindUserCellTransferResultDocument = `
+    query findUserCellTransferResult($id: Float!, $transferInStatus: [UserCellTransferStatus!], $transferOutStatus: [UserCellTransferStatus!], $transferInDateFilter: DateFilter, $transferOutDateFilter: DateFilter) {
+  findCell(id: $id) {
+    transfersIn(status: $transferInStatus, orderDate: $transferInDateFilter) {
+      id
+      status
+      orderDate
+      completeDate
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+    transfersOut(status: $transferOutStatus, orderDate: $transferOutDateFilter) {
+      id
+      status
+      orderDate
+      completeDate
+      user {
+        id
+        name
+        gender
+      }
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+    }
+  }
+}
+    `
+export const useFindUserCellTransferResultQuery = <
+  TData = FindUserCellTransferResultQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindUserCellTransferResultQueryVariables,
+  options?: UseQueryOptions<FindUserCellTransferResultQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindUserCellTransferResultQuery, TError, TData>(
+    ['findUserCellTransferResult', variables],
+    fetcher<
+      FindUserCellTransferResultQuery,
+      FindUserCellTransferResultQueryVariables
+    >(client, FindUserCellTransferResultDocument, variables, headers),
+    options
+  )
+
+useFindUserCellTransferResultQuery.getKey = (
+  variables: FindUserCellTransferResultQueryVariables
+) => ['findUserCellTransferResult', variables]
 export const FindUsersDocument = `
     query findUsers($name: String, $limit: Int, $offset: Int) {
   findUsers(name: $name, limit: $limit, offset: $offset) {
@@ -829,3 +1184,56 @@ export const useUpdateUserMutation = <TError = unknown, TContext = unknown>(
     options
   )
 useUpdateUserMutation.getKey = () => ['updateUser']
+
+export const UpdateUserCellTransferDocument = `
+    mutation updateUserCellTransfer($input: UpdateUserCellTransferInput!) {
+  updateUserCellTransfer(input: $input) {
+    userCellTransfer {
+      id
+      user {
+        id
+        name
+      }
+      status
+      fromCell {
+        id
+        name
+      }
+      toCell {
+        id
+        name
+      }
+      orderDate
+      completeDate
+    }
+  }
+}
+    `
+export const useUpdateUserCellTransferMutation = <
+  TError = unknown,
+  TContext = unknown
+>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    UpdateUserCellTransferMutation,
+    TError,
+    UpdateUserCellTransferMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    UpdateUserCellTransferMutation,
+    TError,
+    UpdateUserCellTransferMutationVariables,
+    TContext
+  >(
+    ['updateUserCellTransfer'],
+    (variables?: UpdateUserCellTransferMutationVariables) =>
+      fetcher<
+        UpdateUserCellTransferMutation,
+        UpdateUserCellTransferMutationVariables
+      >(client, UpdateUserCellTransferDocument, variables, headers)(),
+    options
+  )
+useUpdateUserCellTransferMutation.getKey = () => ['updateUserCellTransfer']

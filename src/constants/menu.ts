@@ -54,3 +54,9 @@ export const cellMenu = [
     icon: '✈️',
   },
 ]
+
+export const cellTransferTabs = [
+  { id: 0, title: '이동신청' },
+  { id: 1, title: '이동승인' },
+  { id: 2, title: '이동결과' },
+]

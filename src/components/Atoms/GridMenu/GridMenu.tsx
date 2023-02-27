@@ -1,4 +1,6 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React from 'react'
+import { useRecoilState } from 'recoil'
+import { stateSetting } from '@/stores/stateSetting'
 import Spacer from '../Spacer'
 
 interface GridMenuProps {
@@ -7,17 +9,19 @@ interface GridMenuProps {
     title: string
     icon: string
   }[]
-  setSelected: Dispatch<SetStateAction<number>>
 }
 
-const GridMenu = ({ menuList, setSelected }: GridMenuProps) => {
+const GridMenu = ({ menuList }: GridMenuProps) => {
+  const [setting, setSetting] = useRecoilState(stateSetting)
   return (
     <div className="grid grid-cols-3">
       {menuList.map((menu) => (
         <div
           key={menu.id}
           className="inline-block text-center mr-6 cursor-pointer"
-          onClick={() => setSelected(menu.id)}
+          onClick={() =>
+            setSetting({ ...setting, cellSelectedCategoryId: menu.id })
+          }
         >
           <div className="flex items-center justify-center p-8 rounded-2xl shadow-lg bg-gray-50">
             <p className="text-3xl">{menu.icon}</p>

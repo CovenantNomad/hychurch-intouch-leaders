@@ -12,7 +12,7 @@ const Sidebar = ({}: SidebarProps) => {
 
   return (
     <div
-      className={`hidden fixed left-0 top-0 bottom-0 flex-col flex-nowrap overflow-hidden z-[2000] px-6 transition-all duration-300 bg-white lg:flex lg:shadow-xl lg:w-60`}
+      className={`hidden fixed left-0 top-0 bottom-0 flex-col flex-nowrap overflow-hidden z-[2000] px-6 transition-all duration-300 bg-gray-100 lg:flex lg:shadow-xl lg:w-60`}
     >
       <div className="py-6">
         <h1 className="text-xl font-bold text-black">INTOUCH CHURCH</h1>

@@ -1,4 +1,4 @@
-import { Gender, RoleType } from '@/graphql/generated'
+import { Gender, RoleType, UserCellTransferStatus } from '@/graphql/generated'
 
 export interface Member {
   id: string
@@ -17,4 +17,24 @@ export interface Member {
     | undefined
   roles: RoleType[]
   description?: string | null | undefined
+}
+
+export interface TransferedUserType {
+  id: string
+  status: UserCellTransferStatus
+  orderDate: string
+  completeDate?: string | null | undefined
+  fromCell: {
+    id: string
+    name: string
+  }
+  toCell: {
+    id: string
+    name: string
+  }
+  user: {
+    id: string
+    name: string
+    gender?: Gender | null | undefined
+  }
 }

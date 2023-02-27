@@ -24,27 +24,26 @@ const CellMemberListItem = ({
 }: CellMemberListItemProps) => {
   const nameCheck = /^[a-zA-Z]*$/
   return (
-    <Link href={`/cell/members/${name}`}>
-      <div className="flex items-center py-4 border-b cursor-pointer">
-        <Avatar
-          size={AvatarSize.md}
-          name={name.substring(
-            nameCheck.test(name) ? name.length - 3 : name.length - 2
-          )}
-          rounded
-        />
-        <div className="ml-4 flex-1">
-          <ListTitleText>
-            {name} {gender === 'MAN' ? '형제' : '자매'}
-          </ListTitleText>
-          <ListSubTitleText>{birthday}</ListSubTitleText>
-        </div>
-        <div className="flex items-center gap-x-2">
-          <IoIosPhonePortrait size={15} />
-          <p>{phone}</p>
-        </div>
+    <div className="flex items-center py-4 border-b cursor-pointer">
+      <Avatar
+        size={AvatarSize.md}
+        name={name.substring(
+          nameCheck.test(name) ? name.length - 3 : name.length - 2
+        )}
+        rounded
+      />
+      <div className="ml-4 flex-1">
+        <ListTitleText>
+          {name} {gender === 'MAN' ? '형제' : '자매'}
+        </ListTitleText>
+        <ListSubTitleText>{phone}</ListSubTitleText>
       </div>
-    </Link>
+      <Link href={`/cell/members/${name}`}>
+        <button className="inline-flex items-center rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm font-medium leading-5 text-gray-700 shadow-sm hover:bg-gray-50">
+          View
+        </button>
+      </Link>
+    </div>
   )
 }
 

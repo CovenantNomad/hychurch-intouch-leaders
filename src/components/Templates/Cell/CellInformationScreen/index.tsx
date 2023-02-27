@@ -8,7 +8,7 @@ import {
   useFindCellQuery,
 } from '@/graphql/generated'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
-import groupBy from '@/utils/utils'
+import { groupBy } from '@/utils/utils'
 //components
 import Spacer from '@/components/Atoms/Spacer'
 import Spinner from '@/components/Atoms/Spinner'

@@ -6,13 +6,7 @@ interface SpacerProps {
 }
 
 const Spacer = ({ background, size = 'h-8' }: SpacerProps) => {
-  return (
-    <div
-      className={`${size} ${
-        background ? 'bg-white' : 'bg-inherit'
-      } dark:bg-[#222222]`}
-    />
-  )
+  return <div className={`${size}`} />
 }
 
 export default Spacer

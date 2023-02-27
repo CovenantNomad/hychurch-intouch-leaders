@@ -1,0 +1,5 @@
+mutation createUserCellTransfer($input: CreateUserCellTransferInput!) {
+  createUserCellTransfer(input: $input) {
+    success
+  }
+}
