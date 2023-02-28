@@ -25,13 +25,7 @@ const CellMemberListItem = ({
   const nameCheck = /^[a-zA-Z]*$/
   return (
     <div className="flex items-center py-4 border-b cursor-pointer">
-      <Avatar
-        size={AvatarSize.md}
-        name={name.substring(
-          nameCheck.test(name) ? name.length - 3 : name.length - 2
-        )}
-        rounded
-      />
+      <Avatar size={AvatarSize.md} name={name} rounded />
       <div className="ml-4 flex-1">
         <ListTitleText>
           {name} {gender === 'MAN' ? '형제' : '자매'}

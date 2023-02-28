@@ -26,7 +26,8 @@ const Home = ({}: HomeProps) => {
 
       <Container>
         <Spacer size={'h-6'} />
-        <h4 className="text-2xl font-bold tracking-wide">
+        <p className="w-fit bg-black text-white px-2 py-1">Worship Master</p>
+        <h4 className="text-2xl font-bold tracking-wide whitespace-pre-line">
           {userInfo?.name} 리더님 👋
         </h4>
         <Spacer size={'h-3'} />
