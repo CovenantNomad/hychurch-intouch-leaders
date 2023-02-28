@@ -18,11 +18,11 @@ const CellTransferHistoryListItem = ({
         <p className="text-base">{member.user.name}</p>
       </div>
       <div className="col-span-3 lg:col-span-2">
-        <p>{member.fromCell.name}</p>
+        <p className="text-sm">{member.fromCell.name}</p>
         <ListSubTitleText>From</ListSubTitleText>
       </div>
       <div className="col-span-3 lg:col-span-2">
-        <p>{member.toCell.name}</p>
+        <p className="text-sm">{member.toCell.name}</p>
         <ListSubTitleText>To</ListSubTitleText>
       </div>
       <div className="hidden lg:block lg:col-span-2">

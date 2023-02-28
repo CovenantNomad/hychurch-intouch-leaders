@@ -58,10 +58,12 @@ const CellTransferAccept = ({}: CellTransferAcceptProps) => {
           ))}
         </div>
       ) : (
-        <EmptyStateStarting
-          title="요청 사항이 없습니다"
-          descrtiption="우리 셀로 배정신청 된 사항이 없습니다"
-        />
+        <div className="flex justify-center items-center py-20 lg:py-32">
+          <EmptyStateStarting
+            title="요청 사항이 없습니다"
+            descrtiption="우리 셀로 배정신청 된 사항이 없습니다"
+          />
+        </div>
       )}
     </div>
   )

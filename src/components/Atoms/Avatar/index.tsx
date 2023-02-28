@@ -16,6 +16,7 @@ interface AvatarProps {
 }
 
 const Avatar = ({ name, size, inline, center, rounded }: AvatarProps) => {
+  const nameCheck = /[a-zA-Z]/
   return (
     <div
       className={`
@@ -28,7 +29,10 @@ const Avatar = ({ name, size, inline, center, rounded }: AvatarProps) => {
       `}
     >
       <span className="text-xl font-medium leading-none text-white">
-        {name}
+        {name.substring(
+          nameCheck.test(name) ? name.length - 3 : name.length - 2,
+          nameCheck.test(name) ? name.length - 1 : name.length
+        )}
       </span>
     </div>
   )

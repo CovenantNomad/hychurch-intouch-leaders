@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Footer from '../Footer'
 import Navbar from '../Navbar/Navbar'
 import Sidebar from '../Sidebar/Sidebar'
 
@@ -11,7 +12,10 @@ const Layout = ({ children }: LayoutProps) => {
     <div>
       <Navbar />
       <Sidebar />
-      <main className="lg:ml-60 bg-[#fff]">{children}</main>
+      <main className="lg:ml-60 bg-[#fff]">
+        {children}
+        <Footer />
+      </main>
     </div>
   )
 }

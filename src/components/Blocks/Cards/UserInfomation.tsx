@@ -23,7 +23,7 @@ const UserInfomation = ({
   return (
     <div className="border px-4 py-4 rounded-md bg-white">
       <div className="flex gap-x-4 items-center mb-6">
-        <Avatar name={name.substr(-2)} size={AvatarSize.md} inline />
+        <Avatar name={name} size={AvatarSize.md} inline />
         <h6 className="text-xl font-medium tracking-wide">{name}</h6>
       </div>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-8">
