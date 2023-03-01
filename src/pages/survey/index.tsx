@@ -4,7 +4,7 @@ import Layout from '@components/Atoms/Layout/Layout'
 
 interface AttendanceProps {}
 
-const Attendance = ({}: AttendanceProps) => {
+const SurveyPage = ({}: AttendanceProps) => {
   return (
     <Layout>
       <div className="h-screen flex justify-center items-center">
@@ -18,4 +18,4 @@ const Attendance = ({}: AttendanceProps) => {
   )
 }
 
-export default Attendance
+export default SurveyPage
