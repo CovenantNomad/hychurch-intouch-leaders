@@ -30,10 +30,10 @@ export const mainMenu: menuType[] = [
   },
   {
     id: 3,
-    title: '계정설정',
-    icon: '⚙️',
+    title: '설문조사',
+    icon: '✍️',
     color: '#F9E8E5',
-    pathname: '/setting',
+    pathname: '/survey',
   },
 ]
 

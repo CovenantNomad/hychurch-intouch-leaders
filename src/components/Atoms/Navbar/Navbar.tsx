@@ -21,13 +21,15 @@ const Navbar = ({}: NavbarProps) => {
     <>
       <div className="h-16 flex justify-between items-center px-4 md:px-6 lg:hidden">
         <HamburgerMenu isOpen={isOpen} setIsOpen={setIsOpen} />
-        <Image
-          src={'/images/Intouch_logo.png'}
-          height={40}
-          width={40}
-          alt="인터치교회 로고"
-          className="cursor-pointer"
-        />
+        <button>
+          <Image
+            src={'/images/Intouch_logo.png'}
+            height={40}
+            width={40}
+            alt="인터치교회 로고"
+            className="cursor-pointer"
+          />
+        </button>
       </div>
       {isOpen && (
         <div
