@@ -130,6 +130,8 @@ export type DateFilter = {
 export type DeleteCellInput = {
   /** 셀 아이디 */
   cellId: Scalars['Int']
+  /** 셀리더를 이동시킬 타겟셀 아이디 */
+  targetCellId: Scalars['Int']
 }
 
 export type DeleteCellPayload = {
@@ -241,6 +243,8 @@ export type Query = {
   me: User
   /** 셀원 조회. 셀장만 셀원 조회가 가능합니다. */
   myCellMembers?: Maybe<Array<User>>
+  /** 사용자 정보를 조회합니다. */
+  user: User
 }
 
 export type QueryFindCellArgs = {
@@ -256,6 +260,10 @@ export type QueryFindUsersArgs = {
   limit?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
   offset?: InputMaybe<Scalars['Int']>
+}
+
+export type QueryUserArgs = {
+  id: Scalars['ID']
 }
 
 export type RegisterNewUserInput = {
@@ -523,6 +531,27 @@ export type FindCellQuery = {
       totalCountOfMembers: number
       countOfActiveMembers: number
     }
+  }
+}
+
+export type FindMyCellMemberQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type FindMyCellMemberQuery = {
+  __typename?: 'Query'
+  user: {
+    __typename?: 'User'
+    id: string
+    name: string
+    phone: string
+    isActive: boolean
+    birthday?: string | null
+    gender?: Gender | null
+    address?: string | null
+    description?: string | null
+    roles: Array<RoleType>
+    cell?: { __typename?: 'Cell'; id: string; name: string } | null
   }
 }
 
@@ -881,6 +910,48 @@ useFindCellQuery.getKey = (variables: FindCellQueryVariables) => [
   'findCell',
   variables,
 ]
+export const FindMyCellMemberDocument = `
+    query findMyCellMember($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
+    `
+export const useFindMyCellMemberQuery = <
+  TData = FindMyCellMemberQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindMyCellMemberQueryVariables,
+  options?: UseQueryOptions<FindMyCellMemberQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindMyCellMemberQuery, TError, TData>(
+    ['findMyCellMember', variables],
+    fetcher<FindMyCellMemberQuery, FindMyCellMemberQueryVariables>(
+      client,
+      FindMyCellMemberDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindMyCellMemberQuery.getKey = (
+  variables: FindMyCellMemberQueryVariables
+) => ['findMyCellMember', variables]
 export const FindMyCellMembersDocument = `
     query findMyCellMembers {
   myCellMembers {

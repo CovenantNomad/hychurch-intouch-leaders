@@ -1,0 +1,17 @@
+query findMyCellMember($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
