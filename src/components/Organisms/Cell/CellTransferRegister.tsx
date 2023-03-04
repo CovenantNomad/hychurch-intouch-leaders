@@ -137,10 +137,10 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
             !cell.id.includes(SpecialCellIdType.NewFamily) &&
             !cell.id.includes(SpecialCellIdType.Blessing)
         )
-        .map((member) => {
+        .map((cell) => {
           return {
-            id: member.id,
-            name: member.name,
+            id: cell.id,
+            name: cell.name,
           }
         })
       setCellList(cellList)

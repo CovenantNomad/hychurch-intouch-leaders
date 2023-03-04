@@ -7,31 +7,46 @@ import UserInfomation from '@/components/Blocks/Cards/UserInfomation'
 import UserInfomationForm from '@/components/Blocks/Forms/UserInfomationForm'
 import Header from '@/components/Blocks/Headers/Header'
 import {
+  FindMyCellMemberQuery,
+  FindMyCellMemberQueryVariables,
   FindUsersQuery,
   FindUsersQueryVariables,
+  useFindMyCellMemberQuery,
   useFindUsersQuery,
 } from '@/graphql/generated'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface CellMemberDetailScreenProps {}
 
 const CellMemberDetailScreen = ({}: CellMemberDetailScreenProps) => {
   const router = useRouter()
+  const [userId, setUserId] = useState<string>('')
   const [editMode, setEditMode] = useState(false)
-  const { isLoading, data } = useFindUsersQuery<
-    FindUsersQuery,
-    FindUsersQueryVariables
+  const { isLoading, data } = useFindMyCellMemberQuery<
+    FindMyCellMemberQuery,
+    FindMyCellMemberQueryVariables
   >(
     graphlqlRequestClient,
     {
-      name: typeof router.query.slug === 'string' ? router.query.slug : null,
+      id: userId,
     },
     {
+      enabled: userId !== '',
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
     }
   )
+
+  useEffect(() => {
+    if (router.isReady) {
+      if (typeof router.query.id === 'string') {
+        setUserId(router.query.id)
+      } else {
+        setUserId('')
+      }
+    }
+  }, [router])
 
   return (
     <>
@@ -42,34 +57,34 @@ const CellMemberDetailScreen = ({}: CellMemberDetailScreenProps) => {
       ) : data ? (
         <>
           <Header
-            cellId={data?.findUsers.nodes[0].cell?.id}
-            cellName={data?.findUsers.nodes[0].cell?.name}
-            userName={data?.findUsers.nodes[0].name}
+            cellId={data.user.cell?.id}
+            cellName={data.user.cell?.name}
+            userName={data.user.name}
             editMode={editMode}
             setEditMode={setEditMode}
           />
           <Container>
             {!editMode ? (
               <UserInfomation
-                name={data.findUsers.nodes[0].name}
-                gender={data.findUsers.nodes[0].gender}
-                isActive={data.findUsers.nodes[0].isActive}
-                birthday={data.findUsers.nodes[0].birthday}
-                phone={data.findUsers.nodes[0].phone}
-                address={data.findUsers.nodes[0].address}
-                description={data.findUsers.nodes[0].description}
+                name={data.user.name}
+                gender={data.user.gender}
+                isActive={data.user.isActive}
+                birthday={data.user.birthday}
+                phone={data.user.phone}
+                address={data.user.address}
+                description={data.user.description}
               />
             ) : (
               <UserInfomationForm
-                id={data.findUsers.nodes[0].id}
-                name={data.findUsers.nodes[0].name}
-                gender={data.findUsers.nodes[0].gender}
-                isActive={data.findUsers.nodes[0].isActive}
-                birthday={data.findUsers.nodes[0].birthday}
-                phone={data.findUsers.nodes[0].phone}
-                address={data.findUsers.nodes[0].address}
-                description={data.findUsers.nodes[0].description}
-                cell={data.findUsers.nodes[0].cell}
+                id={data.user.id}
+                name={data.user.name}
+                gender={data.user.gender}
+                isActive={data.user.isActive}
+                birthday={data.user.birthday}
+                phone={data.user.phone}
+                address={data.user.address}
+                description={data.user.description}
+                cell={data.user.cell}
               />
             )}
           </Container>

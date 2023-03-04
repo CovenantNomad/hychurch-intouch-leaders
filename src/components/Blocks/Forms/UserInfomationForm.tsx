@@ -59,7 +59,7 @@ const UserInfomationForm = ({
       onSuccess: (data) => {
         toast.success('정보가 수정되었습니다')
         queryClient.invalidateQueries({
-          queryKey: ['findUsers', { name: name }],
+          queryKey: ['findMyCellMember', { id: id }],
         })
       },
       onError: (errors: GraphQLError) => {
