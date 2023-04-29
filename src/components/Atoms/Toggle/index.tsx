@@ -1,7 +1,6 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import { Switch } from '@headlessui/react'
 import { classNames } from '@/utils/utils'
-import { IndividualAttendance } from '@/components/Organisms/Attendance/AttendanceForm'
 
 interface ToggleProps {
   value: any
