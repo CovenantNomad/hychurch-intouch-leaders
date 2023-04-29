@@ -1,4 +1,4 @@
-schema: https://hychurch-dev.duckdns.org:3000/graphql
+schema: https://hychurch-dev.duckdns.org/graphql
 documents: './src/graphql/**/*.graphql'
 ignoreNoDocuments: true,
 generates:

@@ -1,0 +1,9 @@
+query findChurchServices {
+  findChurchServices {
+    id
+    name
+    startAt
+    isActive
+    description
+  }
+}

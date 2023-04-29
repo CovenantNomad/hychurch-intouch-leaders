@@ -1,3 +1,5 @@
+import { StepStatus } from '@/types/common'
+
 export interface menuType {
   id: number
   title: string
@@ -59,4 +61,10 @@ export const cellTransferTabs = [
   { id: 0, title: '이동신청' },
   { id: 1, title: '이동승인' },
   { id: 2, title: '이동결과' },
+]
+
+export const AttendanceSteps = [
+  { id: 0, title: '출석체크' },
+  { id: 1, title: '검토' },
+  { id: 2, title: '제출완료' },
 ]
