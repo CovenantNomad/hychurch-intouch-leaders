@@ -1,0 +1,8 @@
+mutation submitAttendance(
+  $input: SubmitCellMemberChurchServiceAttendanceHistoriesInput!
+) {
+  submitCellMemberChurchServiceAttendanceHistories(input: $input) {
+    requestedAttendanceHistoryCount
+    processedAttendanceHistoryCount
+  }
+}
