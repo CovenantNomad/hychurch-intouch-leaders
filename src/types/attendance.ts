@@ -1,20 +1,36 @@
 export enum AttendanceStatus {
-  BEFORE = 'before',
-  TEMPORARY = 'temporary',
-  COMPLETED = 'completed',
+  NOT_SUBMITTED = 'NOT_SUBMITTED',
+  TEMPORARY_SAVE = 'TEMPORARY_SAVE',
+  COMPLETE = 'COMPLETE',
 }
 
-export interface Attendance {
+export interface TempSavedAttendanceHistory {
   userId: string
-  userName: string
+  userName?: string | null | undefined
   churchServiceId: string
   attendedAt: string
   isOnline: boolean
-  description?: string
+  description?: string | null | undefined
+}
+
+export interface AttendanceHistory {
+  id: string
+  attendedAt: string
+  user: {
+    id: string
+    name: string
+  }
+  churchService: {
+    id: string
+    name: string
+  }
+  isOnline: boolean
+  description?: string | null | undefined
 }
 
 export interface AttendanceGlobalState {
   status: AttendanceStatus
-  submitDate: string | null
-  attendanceList: Attendance[] | null
+  submitDate: string
+  tempAttendanceList: TempSavedAttendanceHistory[] | null
+  attendanceList: AttendanceHistory[] | null
 }

@@ -10,84 +10,90 @@ import { attendanceState } from '@/stores/attendaceState'
 import { stateUserInfo } from '@/stores/stateUserInfo'
 import { getServiceName, groupByChurchService } from '@/utils/utils'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
-import { Attendance, AttendanceStatus } from '@/types/attendance'
+import { TempSavedAttendanceHistory } from '@/types/attendance'
+import graphlqlRequestClient from '@/client/graphqlRequestClient'
+import { toast } from 'react-hot-toast'
 import {
+  CellLeaderAttendanceSubmissionStatus,
   SubmitAttendanceMutation,
   SubmitAttendanceMutationVariables,
   useSubmitAttendanceMutation,
 } from '@/graphql/generated'
-import graphlqlRequestClient from '@/client/graphqlRequestClient'
-import { toast } from 'react-hot-toast'
+import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
+import useAttendance from '@/hooks/useAttendance'
 
 interface AttendancePreviewProps {
-  sunday: string
-  submitDate: string
   setStepIdx: Dispatch<SetStateAction<number>>
 }
 
-const AttendancePreview = ({
-  sunday,
-  submitDate,
-  setStepIdx,
-}: AttendancePreviewProps) => {
+enum ModalType {
+  TEMPORARY_SAVE = 'TEMPORARY_SAVE',
+  COMPLETE = 'COMPLETE',
+}
+
+const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
   const userInfo = useRecoilValue(stateUserInfo)
-  const [attendance, setAttendance] = useRecoilState(attendanceState)
   const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<ModalType | null>(null)
   const [filterAttendanceList, setFilterAttendanceList] = useState<
-    { serviceId: string; attendanceList: Attendance[] }[]
+    { serviceId: string; tempAttendanceList: TempSavedAttendanceHistory[] }[]
   >([])
 
-  const { mutateAsync } = useSubmitAttendanceMutation<
-    SubmitAttendanceMutation,
-    SubmitAttendanceMutationVariables
-  >(graphlqlRequestClient)
+  const {
+    attendance,
+    onRemoveHandler,
+    onTemporarySaveHandler,
+    onSubmitHandler,
+  } = useAttendance()
 
-  const onRemoveHandler = (userId: string, churchServiceId: string) => {
-    if (attendance.attendanceList !== null) {
-      const filteredList = attendance.attendanceList.filter(
-        (item) =>
-          !(item.userId === userId && item.churchServiceId === churchServiceId)
-      )
-      setAttendance({
-        ...attendance,
-        attendanceList: filteredList,
-      })
+  const onTempModalHandler = () => {
+    setModalType(ModalType.TEMPORARY_SAVE)
+    setModalOpen(true)
+  }
+
+  const onSubmitModalHandler = () => {
+    setModalType(ModalType.COMPLETE)
+    setModalOpen(true)
+  }
+
+  const onTempModalActionHandler = async () => {
+    try {
+      const response = onTemporarySaveHandler()
+      if ((await response).result) {
+        toast.success('임시저장 되었습니다')
+        console.log('@AttendancePreview: ', response)
+      }
+    } catch {
+      toast.error('출석체크 제출에 실패했습니다')
+    } finally {
+      setModalOpen(false)
     }
   }
 
-  const onSubmitHandler = async () => {
-    if (attendance.attendanceList !== null) {
-      try {
-        const submitList = attendance.attendanceList.map((item) => {
-          return {
-            userId: item.userId,
-            churchServiceId: item.churchServiceId,
-            attendedAt: item.attendedAt,
-            isOnline: item.isOnline,
-            description: item.description,
-          }
-        })
-        const response = await mutateAsync({
-          input: {
-            userChurchServiceHistories: submitList,
-            baseDate: submitDate,
-          },
-        })
+  const onSubmitModalActionHandler = async () => {
+    try {
+      const response = onSubmitHandler()
+      if ((await response).result) {
         console.log('@AttendancePreview: ', response)
-        if (response) {
+        toast.success('이번주 출석체크를 성공적으로 제출하였습니다', {
+          duration: 1000,
+        })
+        setTimeout(() => {
           setStepIdx(2)
-        }
-      } catch {
-        toast.error('출석체크 제출에 실패했습니다.')
-      } finally {
-        setModalOpen(false)
+        }, 1500)
       }
+    } catch {
+      toast.error('출석체크 제출에 실패했습니다.')
+    } finally {
+      setModalOpen(false)
     }
   }
 
   useEffect(() => {
-    if (attendance.attendanceList !== null) {
-      setFilterAttendanceList(groupByChurchService(attendance.attendanceList))
+    if (attendance.tempAttendanceList !== null) {
+      setFilterAttendanceList(
+        groupByChurchService(attendance.tempAttendanceList)
+      )
     }
   }, [attendance])
 
@@ -100,20 +106,11 @@ const AttendancePreview = ({
               {userInfo?.cell?.name} 출석체크
             </h1>
             <p className="mt-2 text-sm text-gray-700">
-              {sunday} 예배출석을 아래와 같이 제출합니다
+              {attendance.submitDate} 예배출석을 아래와 같이 제출합니다
             </p>
           </div>
-          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-            <button
-              type="button"
-              onClick={() => setStepIdx(0)}
-              className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              수정
-            </button>
-          </div>
         </div>
-        {attendance.attendanceList ? (
+        {attendance.tempAttendanceList ? (
           <div className="-mx-4 mt-8 flow-root sm:mx-0">
             <table className="min-w-full">
               <colgroup>
@@ -146,7 +143,7 @@ const AttendancePreview = ({
               <tbody>
                 {filterAttendanceList.map((service, index) => (
                   <Fragment key={index}>
-                    {service.attendanceList.length !== 0 && (
+                    {service.tempAttendanceList.length !== 0 && (
                       <tr>
                         <th
                           colSpan={3}
@@ -154,15 +151,18 @@ const AttendancePreview = ({
                           className="bg-gray-50 py-3 text-left text-sm font-semibold text-gray-900"
                         >
                           {getServiceName(service.serviceId)} (참석자:{' '}
-                          {service.attendanceList.length}명)
+                          {service.tempAttendanceList.length}명)
                         </th>
                       </tr>
                     )}
-                    {service.attendanceList
+                    {service.tempAttendanceList
                       .sort(
                         (a, b) =>
                           Number(a.isOnline) - Number(b.isOnline) ||
-                          a.userName.localeCompare(b.userName)
+                          (typeof a.userName === 'string' &&
+                          typeof b.userName === 'string'
+                            ? a.userName.localeCompare(b.userName)
+                            : Number(a.userId) - Number(b.userId))
                       )
                       .map((person, index) => (
                         <tr key={index} className="border-b border-gray-200">
@@ -207,7 +207,7 @@ const AttendancePreview = ({
                   </th>
                   <td className="pl-3 pr-4 pt-6 text-right text-sm text-gray-500 sm:pr-0">
                     {
-                      attendance.attendanceList.filter(
+                      attendance.tempAttendanceList.filter(
                         (participant) => !participant.isOnline
                       ).length
                     }
@@ -230,7 +230,7 @@ const AttendancePreview = ({
                   </th>
                   <td className="pl-3 pr-4 pt-4 text-right text-sm text-gray-500 sm:pr-0">
                     {
-                      attendance.attendanceList.filter(
+                      attendance.tempAttendanceList.filter(
                         (participant) => participant.isOnline
                       ).length
                     }
@@ -252,7 +252,7 @@ const AttendancePreview = ({
                     전체 예배출석 인원
                   </th>
                   <td className="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">
-                    {attendance.attendanceList.length}
+                    {attendance.tempAttendanceList.length}
                   </td>
                 </tr>
               </tfoot>
@@ -261,22 +261,41 @@ const AttendancePreview = ({
         ) : (
           <div>데이터가 없습니다</div>
         )}
-        <div className="mt-8">
-          <button
-            onClick={() => setModalOpen(true)}
-            className="mt-8 w-full bg-blue-500 text-white py-3"
-          >
-            제출
-          </button>
+        <div className="grid grid-cols-12 mt-12 gap-x-4">
+          <div className="col-span-3">
+            <FullWidthButton onClick={() => setStepIdx(0)} outline={true}>
+              수정
+            </FullWidthButton>
+          </div>
+          <div className="col-span-4 col-end-9">
+            <FullWidthButton onClick={onTempModalHandler} outline={true}>
+              임시저장
+            </FullWidthButton>
+          </div>
+          <div className="col-span-4 col-end-13">
+            <FullWidthButton onClick={onSubmitModalHandler} outline={false}>
+              최종제출
+            </FullWidthButton>
+          </div>
         </div>
       </div>
       <SimpleModal
         title={'출석체크'}
-        description={`확실히 체크하셨나요?\n예배출석을 제출하겠습니다`}
-        actionLabel={'제출'}
+        description={`${
+          modalType === ModalType.TEMPORARY_SAVE
+            ? '현재까지 데이터를 임시로 저장하시겠습니까?'
+            : '확실히 체크하셨나요?\n이번주 예배출석을 제출하겠습니다'
+        }`}
+        actionLabel={`${
+          modalType === ModalType.TEMPORARY_SAVE ? '임시저장' : '최종제출'
+        }`}
         open={modalOpen}
         setOpen={setModalOpen}
-        actionHandler={onSubmitHandler}
+        actionHandler={
+          modalType === ModalType.TEMPORARY_SAVE
+            ? onTempModalActionHandler
+            : onSubmitModalActionHandler
+        }
       />
     </div>
   )

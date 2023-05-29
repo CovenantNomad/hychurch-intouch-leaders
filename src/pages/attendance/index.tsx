@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
-import dayjs from 'dayjs'
 import { useRecoilValue } from 'recoil'
 import { stateUserInfo } from '@/stores/stateUserInfo'
-import { attendanceState } from '@/stores/attendaceState'
+//hooks
+import useAttendance from '@/hooks/useAttendance'
 //components
 import Layout from '@components/Atoms/Layout/Layout'
 import Spacer from '@/components/Atoms/Spacer'
@@ -16,50 +16,91 @@ import ListAlerts from '@/components/Atoms/Alerts/ListAlerts'
 import SuccessAlerts from '@/components/Atoms/Alerts/SuccessAlerts'
 import InformationAlerts from '@/components/Atoms/Alerts/InformationAlerts'
 import DescriptionAlerts from '@/components/Atoms/Alerts/DescriptionAlerts'
+import Spinner from '@/components/Atoms/Spinner'
 //etc..
 import { AttendanceSteps } from '@/constants/menu'
 import { AttendanceStatus } from '@/types/attendance'
-import { getTodayString } from '@/utils/dateUtils'
+import {
+  FindmyCellAttendanceQuery,
+  FindmyCellAttendanceQueryVariables,
+  useFindmyCellAttendanceQuery,
+} from '@/graphql/generated'
+import graphlqlRequestClient from '@/client/graphqlRequestClient'
 
 interface AttendanceProps {}
 
 const AttendancePage = ({}: AttendanceProps) => {
-  const today = dayjs()
-  const [sunday, setSunday] = useState(getTodayString(today))
   const userInfo = useRecoilValue(stateUserInfo)
-  const attendanceManagement = useRecoilValue(attendanceState)
+  const { attendance, setAttendance } = useAttendance()
   const [stepIdx, setStepIdx] = useState<number>(0)
   const categories = [
     {
       id: 0,
       name: 'Attendance',
-      component: <AttendanceForm attendedAt={sunday} setStepIdx={setStepIdx} />,
+      component: <AttendanceForm setStepIdx={setStepIdx} />,
     },
     {
       id: 1,
       name: 'Preview',
-      component: (
-        <AttendancePreview
-          sunday={sunday}
-          submitDate={getTodayString(today)}
-          setStepIdx={setStepIdx}
-        />
-      ),
+      component: <AttendancePreview setStepIdx={setStepIdx} />,
     },
     {
       id: 2,
       name: 'Preview',
-      component: <AttendanceComplete sunday={sunday} />,
+      component: <AttendanceComplete />,
     },
   ]
 
-  useEffect(() => {
-    if (today.get('day') === 0) {
-      setSunday(getTodayString(today))
-    } else {
-      setSunday(getTodayString(today.subtract(today.get('day'), 'day')))
+  const { isLoading, data } = useFindmyCellAttendanceQuery<
+    FindmyCellAttendanceQuery,
+    FindmyCellAttendanceQueryVariables
+  >(
+    graphlqlRequestClient,
+    {
+      attendanceDate: attendance.submitDate,
+    },
+    {
+      enabled: Boolean(attendance.submitDate),
+      staleTime: 10 * 60 * 1000,
+      cacheTime: 30 * 60 * 1000,
     }
-  }, [today])
+  )
+
+  useEffect(() => {
+    if (!isLoading) {
+      switch (data?.myCellAttendance.__typename) {
+        case 'CellAttendanceNotSubmitted':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.NOT_SUBMITTED,
+          })
+          break
+        case 'CellAttendanceTempSaved':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.TEMPORARY_SAVE,
+            tempAttendanceList:
+              data.myCellAttendance.tempSavedAttendanceHistories,
+            attendanceList: null,
+          })
+          break
+
+        case 'CellAttendanceCompleted':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.COMPLETE,
+            tempAttendanceList: null,
+            attendanceList: data.myCellAttendance.userChurchServiceHistories,
+          })
+          break
+
+        default:
+          break
+      }
+    }
+  }, [data])
+
+  console.log(attendance.attendanceList)
 
   return (
     <Layout>
@@ -73,35 +114,45 @@ const AttendancePage = ({}: AttendanceProps) => {
         </h4>
         <Spacer size={'h-4 lg:h-8'} />
         <InformationAlerts
-          description={`셀원 출석체크는 매주 화요일 전까지 제출해주세요!\n화요일 이후 수정 및 제출이 불가합니다`}
+          description={`셀원 출석체크는 매주 화요일까지 제출해주세요!\n수요일부터 수정 및 제출이 불가합니다`}
         />
         <Spacer size={'h-6 lg:h-8'} />
-        {attendanceManagement.status === AttendanceStatus.COMPLETED ? (
+        {attendance.status === AttendanceStatus.COMPLETE ? (
           <SuccessAlerts
             description="이번주 출석체크 제출을 완료하였습니다."
             linkText="수정제출"
           />
         ) : (
           <>
-            {attendanceManagement.status === AttendanceStatus.BEFORE && (
+            {attendance.status === AttendanceStatus.NOT_SUBMITTED && (
               <ListAlerts title={'이번주 예배출석을 확인하지 않았습니다'}>
-                <li>{sunday} 출석체크를 제출해주세요</li>
+                <li>{attendance.submitDate} 출석체크를 제출해주세요</li>
               </ListAlerts>
             )}
-            {attendanceManagement.status === AttendanceStatus.TEMPORARY && (
+            {attendance.status === AttendanceStatus.TEMPORARY_SAVE && (
               <DescriptionAlerts
                 description="작성 중인 출석체크가 존재합니다."
-                accentText="웹페이지를 닫을 경우 정보가 소실되어 처음부터 작성해야 합니다"
+                accentText="이어서 출석체크를 작성하시고 최종제출 해주세요"
               />
             )}
             <Spacer size={'h-6 lg:h-12'} />
-            <Steps
-              steps={AttendanceSteps}
-              stepIdx={stepIdx}
-              setSelect={setStepIdx}
-            />
-            <Spacer size={'h-6 lg:h-8'} />
-            {categories[stepIdx].component}
+            <div>
+              {isLoading ? (
+                <div className="flex justify-center items-center pt-12 pb-12">
+                  <Spinner />
+                </div>
+              ) : (
+                <>
+                  <Steps
+                    steps={AttendanceSteps}
+                    stepIdx={stepIdx}
+                    setSelect={setStepIdx}
+                  />
+                  <Spacer size={'h-6 lg:h-8'} />
+                  {categories[stepIdx].component}
+                </>
+              )}
+            </div>
           </>
         )}
       </Container>

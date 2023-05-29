@@ -18,37 +18,37 @@ const Steps = ({ steps, stepIdx, setSelect }: StepsProps) => {
         {steps.map((step) => (
           <li key={step.id} className={'relative flex flex-1'}>
             {step.id < stepIdx ? (
-              <div className="group flex w-full items-center">
-                <span className="flex items-center px-6 py-4 text-sm font-medium">
+              <div className="group w-full flex items-center">
+                <span className="flex flex-col items-center px-6 py-4 gap-y-1 text-sm font-medium md:flex-row md:gap-y-0">
                   <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-teal-500 group-hover:bg-teal-700">
                     <BsCheckLg width={24} height={24} color={'#fff'} />
                   </span>
-                  <span className="ml-4 text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-gray-900 md:flex-row md:ml-4">
                     {step.title}
                   </span>
                 </span>
               </div>
             ) : step.id === stepIdx ? (
               <div
-                className="flex items-center px-6 py-4 text-sm font-medium"
+                className="group w-full flex flex-col items-center justify-center gap-y-1 -ml-2 px-6 py-4 text-sm font-medium md:flex-row md:gap-y-0 md:-ml-0 md:justify-start"
                 aria-current="step"
               >
                 <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-teal-600">
                   <span className="text-teal-600">{step.id + 1}</span>
                 </span>
-                <span className="ml-4 text-sm font-medium text-teal-500">
+                <span className="text-sm font-medium text-teal-500 md:ml-4">
                   {step.title}
                 </span>
               </div>
             ) : (
-              <div className="group flex items-center">
-                <span className="flex items-center px-6 py-4 text-sm font-medium">
+              <div className="group w-full flex items-center justify-center gap-y-1 -ml-2 text-sm font-medium md:flex-row md:justify-start md:gap-y-0 md:-ml-0 ">
+                <span className="flex flex-col items-center px-6 py-4 gap-y-1 text-sm font-medium md:flex-row md:gap-y-0">
                   <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-gray-300 group-hover:border-gray-400">
                     <span className="text-gray-500 group-hover:text-gray-900">
                       {step.id + 1}
                     </span>
                   </span>
-                  <span className="ml-4 text-sm font-medium text-gray-500 group-hover:text-gray-900">
+                  <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 md:ml-4 ">
                     {step.title}
                   </span>
                 </span>

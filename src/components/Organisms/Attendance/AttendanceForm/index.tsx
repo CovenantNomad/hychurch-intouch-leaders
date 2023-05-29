@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import {
   FindChurchServicesQuery,
@@ -16,6 +16,8 @@ import { attendanceState } from '@/stores/attendaceState'
 import { AttendanceStatus } from '@/types/attendance'
 import Spinner from '@/components/Atoms/Spinner'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
+import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
+import useAttendance from '@/hooks/useAttendance'
 
 interface onCheckHandlerPrps {
   checked: boolean
@@ -31,15 +33,16 @@ interface onToggleHandlerPrps {
 }
 
 interface AttendanceFormProps {
-  attendedAt: string
   setStepIdx: Dispatch<SetStateAction<number>>
 }
 
-const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
+const AttendanceForm = ({ setStepIdx }: AttendanceFormProps) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const [attendance, setAttendance] = useRecoilState(attendanceState)
+  const { attendance, setAttendance, onCheckHandler, onToggleHander } =
+    useAttendance()
 
-  const { isLoading, data } = useFindChurchServicesQuery<
+  const { isLoading: serviceLoading, data } = useFindChurchServicesQuery<
     FindChurchServicesQuery,
     FindChurchServicesQueryVariables
   >(
@@ -51,89 +54,44 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
     }
   )
 
-  const { data: cellMember } = useFindMyCellMembersQuery<
-    FindMyCellMembersQuery,
-    FindMyCellMembersQueryVariables
-  >(
-    graphlqlRequestClient,
-    {},
-    {
-      staleTime: 10 * 60 * 1000,
-      cacheTime: 30 * 60 * 1000,
-    }
-  )
-
-  const onCheckHandler = ({
-    checked,
-    churchServiceId,
-    userId,
-    userName,
-    isOnline,
-  }: onCheckHandlerPrps) => {
-    if (checked) {
-      if (attendance.attendanceList === null) {
-        setAttendance({
-          status: AttendanceStatus.TEMPORARY,
-          submitDate: null,
-          attendanceList: [
-            {
-              userId,
-              userName,
-              churchServiceId,
-              isOnline: false,
-              attendedAt,
-            },
-          ],
-        })
-      } else {
-        setAttendance({
-          ...attendance,
-          attendanceList: [
-            ...attendance.attendanceList,
-            {
-              userId,
-              userName,
-              churchServiceId,
-              isOnline: false,
-              attendedAt,
-            },
-          ],
-        })
+  const { isLoading: cellMemberLoading, data: cellMember } =
+    useFindMyCellMembersQuery<
+      FindMyCellMembersQuery,
+      FindMyCellMembersQueryVariables
+    >(
+      graphlqlRequestClient,
+      {},
+      {
+        staleTime: 10 * 60 * 1000,
+        cacheTime: 30 * 60 * 1000,
       }
-    } else {
-      if (attendance.attendanceList !== null) {
-        const filteredList = attendance.attendanceList.filter(
-          (item) =>
-            !(
-              item.userId === userId && item.churchServiceId === churchServiceId
-            )
-        )
-        setAttendance({
-          ...attendance,
-          attendanceList: filteredList,
-        })
-      }
-    }
-  }
-
-  const onToggleHander = ({ userId, churchServiceId }: onToggleHandlerPrps) => {
-    if (attendance.attendanceList !== null) {
-      const toggleList = attendance.attendanceList.map((item) =>
-        item.userId === userId && item.churchServiceId === churchServiceId
-          ? { ...item, isOnline: !item.isOnline }
-          : item
-      )
-      setAttendance({
-        ...attendance,
-        attendanceList: toggleList,
-      })
-    }
-  }
+    )
 
   const onSavingHandler = () => {
     setModalOpen(false)
     setStepIdx(1)
   }
+
+  useEffect(() => {
+    setIsLoading(true)
+    if (!cellMemberLoading && cellMember) {
+      if (attendance.tempAttendanceList !== null && cellMember.myCellMembers) {
+        const mappedList = attendance.tempAttendanceList.map((item) => {
+          return {
+            ...item,
+            userName: cellMember.myCellMembers?.find(
+              (member) => member.id === item.userId
+            )?.name,
+          }
+        })
+        setAttendance({
+          ...attendance,
+          tempAttendanceList: mappedList,
+        })
+      }
+    }
+    setIsLoading(false)
+  }, [cellMemberLoading, cellMember])
 
   return (
     <div>
@@ -157,14 +115,14 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                         <span className="font-medium text-gray-900">
                           {service.name}
                         </span>
-                        {attendance.attendanceList !== null &&
-                          attendance.attendanceList.filter(
+                        {attendance.tempAttendanceList !== null &&
+                          attendance.tempAttendanceList.filter(
                             (item) => item.churchServiceId === service.id
                           ).length !== 0 && (
                             <span className="font-medium text-gray-900 ml-4">
                               (
                               {
-                                attendance.attendanceList.filter(
+                                attendance.tempAttendanceList.filter(
                                   (item) => item.churchServiceId === service.id
                                 ).length
                               }
@@ -201,8 +159,8 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                                 })
                               }
                               checked={
-                                attendance.attendanceList !== null &&
-                                attendance.attendanceList.find(
+                                attendance.tempAttendanceList !== null &&
+                                attendance.tempAttendanceList.find(
                                   (item) =>
                                     item.churchServiceId === service.id &&
                                     item.userId === member.id
@@ -217,8 +175,8 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                               {member.name}
                             </label>
                           </div>
-                          {attendance.attendanceList !== null &&
-                            attendance.attendanceList.find(
+                          {attendance.tempAttendanceList !== null &&
+                            attendance.tempAttendanceList.find(
                               (item) =>
                                 item.churchServiceId === service.id &&
                                 item.userId === member.id
@@ -230,7 +188,7 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                                 <Switch
                                   checked={
                                     attendance.attendanceList !== null &&
-                                    attendance.attendanceList.find(
+                                    attendance.tempAttendanceList.find(
                                       (item) =>
                                         item.churchServiceId === service.id &&
                                         item.userId === member.id
@@ -243,8 +201,8 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                                     })
                                   }
                                   className={classNames(
-                                    attendance.attendanceList !== null &&
-                                      attendance.attendanceList.find(
+                                    attendance.tempAttendanceList !== null &&
+                                      attendance.tempAttendanceList.find(
                                         (item) =>
                                           item.churchServiceId === service.id &&
                                           item.userId === member.id
@@ -257,8 +215,8 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
                                   <span
                                     aria-hidden="true"
                                     className={classNames(
-                                      attendance.attendanceList !== null &&
-                                        attendance.attendanceList.find(
+                                      attendance.tempAttendanceList !== null &&
+                                        attendance.tempAttendanceList.find(
                                           (item) =>
                                             item.churchServiceId ===
                                               service.id &&
@@ -289,12 +247,9 @@ const AttendanceForm = ({ attendedAt, setStepIdx }: AttendanceFormProps) => {
             </Disclosure>
           ))}
           <div className="mt-8">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="w-full bg-blue-500 text-white py-3"
-            >
+            <FullWidthButton onClick={() => setModalOpen(true)}>
               저장
-            </button>
+            </FullWidthButton>
           </div>
         </div>
       )}

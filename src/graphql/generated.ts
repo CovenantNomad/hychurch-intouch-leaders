@@ -80,6 +80,36 @@ export type CellTransfersOutArgs = {
   status?: InputMaybe<Array<UserCellTransferStatus>>
 }
 
+export type CellAttendance = {
+  submitStatus: CellLeaderAttendanceSubmissionStatus
+}
+
+export type CellAttendanceCompleted = CellAttendance & {
+  __typename?: 'CellAttendanceCompleted'
+  submitStatus: CellLeaderAttendanceSubmissionStatus
+  userChurchServiceHistories: Array<UserChurchServiceHistory>
+}
+
+export type CellAttendanceNotSubmitted = CellAttendance & {
+  __typename?: 'CellAttendanceNotSubmitted'
+  submitStatus: CellLeaderAttendanceSubmissionStatus
+}
+
+export type CellAttendanceTempSaved = CellAttendance & {
+  __typename?: 'CellAttendanceTempSaved'
+  submitStatus: CellLeaderAttendanceSubmissionStatus
+  tempSavedAttendanceHistories: Array<TempSavedAttendanceHistory>
+}
+
+export enum CellLeaderAttendanceSubmissionStatus {
+  /** 제출 완료 */
+  Complete = 'COMPLETE',
+  /** 미제출 */
+  NotSubmitted = 'NOT_SUBMITTED',
+  /** 임시 저장 */
+  TemporarySave = 'TEMPORARY_SAVE',
+}
+
 /** 예배 */
 export type ChurchService = {
   __typename?: 'ChurchService'
@@ -269,6 +299,7 @@ export type Query = {
   findUsers: FindUsersPayload
   /** 로그인한 사용자의 정보를 조회합니다. */
   me: User
+  myCellAttendance: CellAttendance
   /** 셀원 조회. 셀장만 셀원 조회가 가능합니다. */
   myCellMembers?: Maybe<Array<User>>
   /** 사용자 정보를 조회합니다. */
@@ -288,6 +319,10 @@ export type QueryFindUsersArgs = {
   limit?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
   offset?: InputMaybe<Scalars['Int']>
+}
+
+export type QueryMyCellAttendanceArgs = {
+  attendanceDate: Scalars['String']
 }
 
 export type QueryUserArgs = {
@@ -373,18 +408,31 @@ export type StatisticsOfCell = {
 }
 
 export type SubmitCellMemberChurchServiceAttendanceHistoriesInput = {
-  /** 셀원 예배 출석이력 제출 기준일자(yyyy-MM-dd). 예) 2022년 5월 29일 예배에 대한 제출이면 2022-05-29 로 입력 */
-  baseDate: Scalars['String']
+  /** 셀원 예배 출석일자(yyyy-MM-dd). 예) 2022년 5월 29일 예배에 대한 제출이면 2022-05-29 로 입력 */
+  attendanceDate: Scalars['String']
+  /** 제출 상태 */
+  submissionStatus: CellLeaderAttendanceSubmissionStatus
   /** 셀원 출석 이력 목록 */
   userChurchServiceHistories: Array<UserChurchServiceHistoryInput>
 }
 
 export type SubmitCellMemberChurchServiceAttendanceHistoriesPayload = {
   __typename?: 'SubmitCellMemberChurchServiceAttendanceHistoriesPayload'
-  /** 처리된 출석이력 건수 */
-  processedAttendanceHistoryCount: Scalars['Int']
-  /** 출석이력 제출요청 건수 */
-  requestedAttendanceHistoryCount: Scalars['Int']
+  success: Scalars['Boolean']
+}
+
+export type TempSavedAttendanceHistory = {
+  __typename?: 'TempSavedAttendanceHistory'
+  /** 예배 출석일 (yyyy-MM-dd) */
+  attendedAt: Scalars['String']
+  /** 예배 아이디 */
+  churchServiceId: Scalars['ID']
+  /** 비고 */
+  description?: Maybe<Scalars['String']>
+  /** 성전/온라인 여부 (true => 온라인) */
+  isOnline: Scalars['Boolean']
+  /** 셀원 아이디 */
+  userId: Scalars['ID']
 }
 
 export type UpdateCellFieldsInput = {
@@ -515,8 +563,6 @@ export type UserChurchServiceHistory = {
 }
 
 export type UserChurchServiceHistoryInput = {
-  /** 예배 출석일 (yyyy-MM-dd) */
-  attendedAt: Scalars['String']
   /** 예배 아이디 */
   churchServiceId: Scalars['ID']
   /** 비고 */
@@ -541,6 +587,48 @@ export type FindChurchServicesQuery = {
   }>
 }
 
+export type FindmyCellAttendanceQueryVariables = Exact<{
+  attendanceDate: Scalars['String']
+}>
+
+export type FindmyCellAttendanceQuery = {
+  __typename?: 'Query'
+  myCellAttendance:
+    | {
+        __typename: 'CellAttendanceCompleted'
+        submitStatus: CellLeaderAttendanceSubmissionStatus
+        userChurchServiceHistories: Array<{
+          __typename?: 'UserChurchServiceHistory'
+          id: string
+          attendedAt: string
+          isOnline: boolean
+          description?: string | null
+          user: { __typename?: 'User'; id: string; name: string }
+          churchService: {
+            __typename?: 'ChurchService'
+            id: string
+            name: string
+          }
+        }>
+      }
+    | {
+        __typename: 'CellAttendanceNotSubmitted'
+        submitStatus: CellLeaderAttendanceSubmissionStatus
+      }
+    | {
+        __typename: 'CellAttendanceTempSaved'
+        submitStatus: CellLeaderAttendanceSubmissionStatus
+        tempSavedAttendanceHistories: Array<{
+          __typename?: 'TempSavedAttendanceHistory'
+          userId: string
+          churchServiceId: string
+          isOnline: boolean
+          attendedAt: string
+          description?: string | null
+        }>
+      }
+}
+
 export type SubmitAttendanceMutationVariables = Exact<{
   input: SubmitCellMemberChurchServiceAttendanceHistoriesInput
 }>
@@ -549,8 +637,7 @@ export type SubmitAttendanceMutation = {
   __typename?: 'Mutation'
   submitCellMemberChurchServiceAttendanceHistories: {
     __typename?: 'SubmitCellMemberChurchServiceAttendanceHistoriesPayload'
-    requestedAttendanceHistoryCount: number
-    processedAttendanceHistoryCount: number
+    success: boolean
   }
 }
 
@@ -894,11 +981,70 @@ useFindChurchServicesQuery.getKey = (
   variables === undefined
     ? ['findChurchServices']
     : ['findChurchServices', variables]
+export const FindmyCellAttendanceDocument = `
+    query findmyCellAttendance($attendanceDate: String!) {
+  myCellAttendance(attendanceDate: $attendanceDate) {
+    __typename
+    ... on CellAttendanceNotSubmitted {
+      submitStatus
+    }
+    ... on CellAttendanceCompleted {
+      submitStatus
+      userChurchServiceHistories {
+        id
+        attendedAt
+        isOnline
+        description
+        user {
+          id
+          name
+        }
+        churchService {
+          id
+          name
+        }
+      }
+    }
+    ... on CellAttendanceTempSaved {
+      submitStatus
+      tempSavedAttendanceHistories {
+        userId
+        churchServiceId
+        isOnline
+        attendedAt
+        description
+      }
+    }
+  }
+}
+    `
+export const useFindmyCellAttendanceQuery = <
+  TData = FindmyCellAttendanceQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindmyCellAttendanceQueryVariables,
+  options?: UseQueryOptions<FindmyCellAttendanceQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindmyCellAttendanceQuery, TError, TData>(
+    ['findmyCellAttendance', variables],
+    fetcher<FindmyCellAttendanceQuery, FindmyCellAttendanceQueryVariables>(
+      client,
+      FindmyCellAttendanceDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindmyCellAttendanceQuery.getKey = (
+  variables: FindmyCellAttendanceQueryVariables
+) => ['findmyCellAttendance', variables]
 export const SubmitAttendanceDocument = `
     mutation submitAttendance($input: SubmitCellMemberChurchServiceAttendanceHistoriesInput!) {
   submitCellMemberChurchServiceAttendanceHistories(input: $input) {
-    requestedAttendanceHistoryCount
-    processedAttendanceHistoryCount
+    success
   }
 }
     `

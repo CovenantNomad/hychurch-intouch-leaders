@@ -53,8 +53,6 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
     }
   )
 
-  console.log(data)
-
   return (
     <div>
       {isLoading ? (

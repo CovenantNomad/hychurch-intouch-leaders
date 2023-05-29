@@ -5,19 +5,16 @@ import { attendanceState } from '@/stores/attendaceState'
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import { AttendanceStatus } from '@/types/attendance'
 
-interface AttendanceCompleteProps {
-  sunday: string
-}
+interface AttendanceCompleteProps {}
 
-const AttendanceComplete = ({ sunday }: AttendanceCompleteProps) => {
+const AttendanceComplete = ({}: AttendanceCompleteProps) => {
   const navigation = useRouter()
   const [attendance, setAttendance] = useRecoilState(attendanceState)
 
   const onCloseHandler = () => {
     setAttendance({
-      status: AttendanceStatus.COMPLETED,
-      attendanceList: null,
-      submitDate: null,
+      ...attendance,
+      status: AttendanceStatus.COMPLETE,
     })
     navigation.push('/home')
   }
@@ -34,7 +31,7 @@ const AttendanceComplete = ({ sunday }: AttendanceCompleteProps) => {
           </div>
           <div className="ml-3">
             <p className="text-sm font-medium text-green-800">
-              {`${sunday} 출석체크를 성공적으로 제출하였습니다.`}
+              {`${attendance.submitDate} 출석체크를 성공적으로 제출하였습니다.`}
             </p>
           </div>
         </div>
