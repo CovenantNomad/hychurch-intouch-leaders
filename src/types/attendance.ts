@@ -6,7 +6,7 @@ export enum AttendanceStatus {
 
 export interface TempSavedAttendanceHistory {
   userId: string
-  userName?: string | null | undefined
+  userName: string
   churchServiceId: string
   attendedAt: string
   isOnline: boolean

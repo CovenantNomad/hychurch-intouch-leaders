@@ -31,76 +31,44 @@ interface AttendanceProps {}
 
 const AttendancePage = ({}: AttendanceProps) => {
   const userInfo = useRecoilValue(stateUserInfo)
-  const { attendance, setAttendance } = useAttendance()
+  const {
+    isLoading,
+    attendance,
+    setAttendance,
+    onCheckHandler,
+    onToggleHander,
+    onRemoveHandler,
+    onTemporarySaveHandler,
+    onSubmitHandler,
+  } = useAttendance()
   const [stepIdx, setStepIdx] = useState<number>(0)
   const categories = [
     {
       id: 0,
       name: 'Attendance',
-      component: <AttendanceForm setStepIdx={setStepIdx} />,
+      component: (
+        <AttendanceForm
+          setStepIdx={setStepIdx}
+          attendance={attendance}
+          onCheckHandler={onCheckHandler}
+          onToggleHander={onToggleHander}
+        />
+      ),
     },
     {
       id: 1,
       name: 'Preview',
-      component: <AttendancePreview setStepIdx={setStepIdx} />,
-    },
-    {
-      id: 2,
-      name: 'Preview',
-      component: <AttendanceComplete />,
+      component: (
+        <AttendancePreview
+          setStepIdx={setStepIdx}
+          attendance={attendance}
+          onRemoveHandler={onRemoveHandler}
+          onTemporarySaveHandler={onTemporarySaveHandler}
+          onSubmitHandler={onSubmitHandler}
+        />
+      ),
     },
   ]
-
-  const { isLoading, data } = useFindmyCellAttendanceQuery<
-    FindmyCellAttendanceQuery,
-    FindmyCellAttendanceQueryVariables
-  >(
-    graphlqlRequestClient,
-    {
-      attendanceDate: attendance.submitDate,
-    },
-    {
-      enabled: Boolean(attendance.submitDate),
-      staleTime: 10 * 60 * 1000,
-      cacheTime: 30 * 60 * 1000,
-    }
-  )
-
-  useEffect(() => {
-    if (!isLoading) {
-      switch (data?.myCellAttendance.__typename) {
-        case 'CellAttendanceNotSubmitted':
-          setAttendance({
-            ...attendance,
-            status: AttendanceStatus.NOT_SUBMITTED,
-          })
-          break
-        case 'CellAttendanceTempSaved':
-          setAttendance({
-            ...attendance,
-            status: AttendanceStatus.TEMPORARY_SAVE,
-            tempAttendanceList:
-              data.myCellAttendance.tempSavedAttendanceHistories,
-            attendanceList: null,
-          })
-          break
-
-        case 'CellAttendanceCompleted':
-          setAttendance({
-            ...attendance,
-            status: AttendanceStatus.COMPLETE,
-            tempAttendanceList: null,
-            attendanceList: data.myCellAttendance.userChurchServiceHistories,
-          })
-          break
-
-        default:
-          break
-      }
-    }
-  }, [data])
-
-  console.log(attendance.attendanceList)
 
   return (
     <Layout>
@@ -118,10 +86,7 @@ const AttendancePage = ({}: AttendanceProps) => {
         />
         <Spacer size={'h-6 lg:h-8'} />
         {attendance.status === AttendanceStatus.COMPLETE ? (
-          <SuccessAlerts
-            description="이번주 출석체크 제출을 완료하였습니다."
-            linkText="수정제출"
-          />
+          <SuccessAlerts description="이번주 출석체크 제출을 완료하였습니다." />
         ) : (
           <>
             {attendance.status === AttendanceStatus.NOT_SUBMITTED && (

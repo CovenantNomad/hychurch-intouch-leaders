@@ -10,7 +10,10 @@ import { attendanceState } from '@/stores/attendaceState'
 import { stateUserInfo } from '@/stores/stateUserInfo'
 import { getServiceName, groupByChurchService } from '@/utils/utils'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
-import { TempSavedAttendanceHistory } from '@/types/attendance'
+import {
+  AttendanceGlobalState,
+  TempSavedAttendanceHistory,
+} from '@/types/attendance'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import { toast } from 'react-hot-toast'
 import {
@@ -23,6 +26,10 @@ import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
 import useAttendance from '@/hooks/useAttendance'
 
 interface AttendancePreviewProps {
+  attendance: AttendanceGlobalState
+  onRemoveHandler: (userId: string, churchServiceId: string) => void
+  onTemporarySaveHandler: () => Promise<{ result: SubmitAttendanceMutation }>
+  onSubmitHandler: () => Promise<{ result: SubmitAttendanceMutation }>
   setStepIdx: Dispatch<SetStateAction<number>>
 }
 
@@ -31,20 +38,19 @@ enum ModalType {
   COMPLETE = 'COMPLETE',
 }
 
-const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
+const AttendancePreview = ({
+  attendance,
+  onRemoveHandler,
+  onTemporarySaveHandler,
+  onSubmitHandler,
+  setStepIdx,
+}: AttendancePreviewProps) => {
   const userInfo = useRecoilValue(stateUserInfo)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState<ModalType | null>(null)
   const [filterAttendanceList, setFilterAttendanceList] = useState<
     { serviceId: string; tempAttendanceList: TempSavedAttendanceHistory[] }[]
   >([])
-
-  const {
-    attendance,
-    onRemoveHandler,
-    onTemporarySaveHandler,
-    onSubmitHandler,
-  } = useAttendance()
 
   const onTempModalHandler = () => {
     setModalType(ModalType.TEMPORARY_SAVE)
@@ -60,11 +66,14 @@ const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
     try {
       const response = onTemporarySaveHandler()
       if ((await response).result) {
-        toast.success('임시저장 되었습니다')
-        console.log('@AttendancePreview: ', response)
+        toast.success(`임시저장 되었습니다.\n이후에 꼭 최종제출 해주세요.`, {
+          duration: 2000,
+        })
       }
     } catch {
-      toast.error('출석체크 제출에 실패했습니다')
+      toast.error(`임시저장 중 오류가 발생했습니다.\n간사님에게 알려주세요.`, {
+        duration: 2000,
+      })
     } finally {
       setModalOpen(false)
     }
@@ -74,16 +83,17 @@ const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
     try {
       const response = onSubmitHandler()
       if ((await response).result) {
-        console.log('@AttendancePreview: ', response)
         toast.success('이번주 출석체크를 성공적으로 제출하였습니다', {
-          duration: 1000,
+          duration: 1500,
         })
         setTimeout(() => {
           setStepIdx(2)
         }, 1500)
       }
     } catch {
-      toast.error('출석체크 제출에 실패했습니다.')
+      toast.error(`최종제출 중 오류가 발생했습니다.\n간사님에게 알려주세요.`, {
+        duration: 2000,
+      })
     } finally {
       setModalOpen(false)
     }
@@ -105,8 +115,8 @@ const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
             <h1 className="text-base font-semibold leading-6 text-gray-900">
               {userInfo?.cell?.name} 출석체크
             </h1>
-            <p className="mt-2 text-sm text-gray-700">
-              {attendance.submitDate} 예배출석을 아래와 같이 제출합니다
+            <p className="mt-2 text-sm text-gray-700 whitespace-pre-line leading-6">
+              {`${attendance.submitDate} 예배출석을 아래와 같이 제출합니다.\n임시저장 또는 최종제출을 눌러 저장해주세요.`}
             </p>
           </div>
         </div>
@@ -264,7 +274,7 @@ const AttendancePreview = ({ setStepIdx }: AttendancePreviewProps) => {
         <div className="grid grid-cols-12 mt-12 gap-x-4">
           <div className="col-span-3">
             <FullWidthButton onClick={() => setStepIdx(0)} outline={true}>
-              수정
+              이전
             </FullWidthButton>
           </div>
           <div className="col-span-4 col-end-9">

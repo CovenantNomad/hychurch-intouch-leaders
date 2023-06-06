@@ -25,6 +25,7 @@ query findmyCellAttendance($attendanceDate: String!) {
       submitStatus
       tempSavedAttendanceHistories{
         userId
+        userName
         churchServiceId
         isOnline
         attendedAt

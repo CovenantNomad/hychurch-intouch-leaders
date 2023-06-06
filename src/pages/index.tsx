@@ -20,16 +20,24 @@ export default function Login() {
       const token = JSON.stringify({ accessToken: data.login.accessToken })
       localStorage.setItem(INTOUCH_LEADERS_ACCESS_TOKEN, token)
       graphlqlRequestClient.setHeader('authorization', data.login.accessToken)
-      const result = await graphlqlRequestClient.request(MeDocument)
-      if (result !== undefined) {
-        setUserInfo({
-          id: result.me.id,
-          name: result.me.name,
-          cell: result.me.cell,
-          roles: result.me.roles,
-        })
+      try {
+        const result = await graphlqlRequestClient.request(MeDocument)
+
+        if (result !== undefined) {
+          setUserInfo({
+            id: result.me.id,
+            name: result.me.name,
+            cell: result.me.cell,
+            roles: result.me.roles,
+          })
+        } else {
+          setUserInfo(null)
+        }
+      } catch (errors) {
+        console.log('@Login: ', errors)
+      } finally {
+        router.push('/home')
       }
-      router.push('/home')
     },
     onError(errors: GraphQLError) {
       toast.error(`로그인에 실패했습니다.`)

@@ -1,13 +1,17 @@
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import {
   CellLeaderAttendanceSubmissionStatus,
+  FindmyCellAttendanceQuery,
+  FindmyCellAttendanceQueryVariables,
   SubmitAttendanceMutation,
   SubmitAttendanceMutationVariables,
+  useFindmyCellAttendanceQuery,
   useSubmitAttendanceMutation,
 } from '@/graphql/generated'
 import { attendanceState } from '@/stores/attendaceState'
 import { AttendanceStatus } from '@/types/attendance'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 
 interface onCheckHandlerPrps {
@@ -27,6 +31,67 @@ const useAttendance = () => {
   const queryClient = useQueryClient()
   const [attendance, setAttendance] = useRecoilState(attendanceState)
 
+  const { isLoading, data } = useFindmyCellAttendanceQuery<
+    FindmyCellAttendanceQuery,
+    FindmyCellAttendanceQueryVariables
+  >(
+    graphlqlRequestClient,
+    {
+      attendanceDate: attendance.submitDate,
+    },
+    {
+      enabled: Boolean(attendance.submitDate),
+      staleTime: 10 * 60 * 1000,
+      cacheTime: 30 * 60 * 1000,
+    }
+  )
+
+  const { mutateAsync } = useSubmitAttendanceMutation<
+    SubmitAttendanceMutation,
+    SubmitAttendanceMutationVariables
+  >(graphlqlRequestClient, {
+    onSettled(data, error, variables, context) {
+      queryClient.invalidateQueries({ queryKey: ['findmyCellAttendance'] })
+    },
+  })
+
+  useEffect(() => {
+    if (!isLoading) {
+      console.log('useEffect 작동됨')
+      switch (data?.myCellAttendance.__typename) {
+        case 'CellAttendanceNotSubmitted':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.NOT_SUBMITTED,
+            tempAttendanceList: null,
+            attendanceList: null,
+          })
+          break
+        case 'CellAttendanceTempSaved':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.TEMPORARY_SAVE,
+            tempAttendanceList:
+              data.myCellAttendance.tempSavedAttendanceHistories,
+            attendanceList: null,
+          })
+          break
+
+        case 'CellAttendanceCompleted':
+          setAttendance({
+            ...attendance,
+            status: AttendanceStatus.COMPLETE,
+            tempAttendanceList: null,
+            attendanceList: data.myCellAttendance.userChurchServiceHistories,
+          })
+          break
+
+        default:
+          break
+      }
+    }
+  }, [data])
+
   const onCheckHandler = ({
     checked,
     churchServiceId,
@@ -37,7 +102,6 @@ const useAttendance = () => {
       if (attendance.tempAttendanceList === null) {
         setAttendance({
           ...attendance,
-          status: AttendanceStatus.TEMPORARY_SAVE,
           submitDate: attendance.submitDate,
           tempAttendanceList: [
             {
@@ -94,17 +158,6 @@ const useAttendance = () => {
     }
   }
 
-  const { mutateAsync } = useSubmitAttendanceMutation<
-    SubmitAttendanceMutation,
-    SubmitAttendanceMutationVariables
-  >(graphlqlRequestClient, {
-    onSettled(data, error, variables, context) {
-      queryClient.invalidateQueries({
-        queryKey: ['findmyCellAttendance'],
-      })
-    },
-  })
-
   const onRemoveHandler = (userId: string, churchServiceId: string) => {
     if (attendance.tempAttendanceList !== null) {
       const filteredList = attendance.tempAttendanceList.filter(
@@ -124,6 +177,7 @@ const useAttendance = () => {
         const submitList = attendance.tempAttendanceList.map((item) => {
           return {
             userId: item.userId,
+            userName: item.userName,
             churchServiceId: item.churchServiceId,
             isOnline: item.isOnline,
             description: item.description,
@@ -155,6 +209,7 @@ const useAttendance = () => {
         const submitList = attendance.tempAttendanceList.map((item) => {
           return {
             userId: item.userId,
+            userName: item.userName,
             churchServiceId: item.churchServiceId,
             isOnline: item.isOnline,
             description: item.description,
@@ -180,6 +235,7 @@ const useAttendance = () => {
   }
 
   return {
+    isLoading,
     attendance,
     setAttendance,
     onCheckHandler,

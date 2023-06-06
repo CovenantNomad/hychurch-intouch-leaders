@@ -1,15 +1,20 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { useRecoilState } from 'recoil'
+import { SetterOrUpdater, useRecoilState } from 'recoil'
 import { attendanceState } from '@/stores/attendaceState'
 import { CheckCircleIcon } from '@heroicons/react/20/solid'
-import { AttendanceStatus } from '@/types/attendance'
+import { AttendanceGlobalState, AttendanceStatus } from '@/types/attendance'
 
-interface AttendanceCompleteProps {}
+interface AttendanceCompleteProps {
+  attendance: AttendanceGlobalState
+  setAttendance: SetterOrUpdater<AttendanceGlobalState>
+}
 
-const AttendanceComplete = ({}: AttendanceCompleteProps) => {
+const AttendanceComplete = ({
+  attendance,
+  setAttendance,
+}: AttendanceCompleteProps) => {
   const navigation = useRouter()
-  const [attendance, setAttendance] = useRecoilState(attendanceState)
 
   const onCloseHandler = () => {
     setAttendance({

@@ -66,5 +66,4 @@ export const cellTransferTabs = [
 export const AttendanceSteps = [
   { id: 0, title: '출석체크' },
   { id: 1, title: '검토' },
-  { id: 2, title: '제출결과' },
 ]

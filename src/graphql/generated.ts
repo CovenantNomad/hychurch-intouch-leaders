@@ -433,6 +433,8 @@ export type TempSavedAttendanceHistory = {
   isOnline: Scalars['Boolean']
   /** 셀원 아이디 */
   userId: Scalars['ID']
+  /** 셀원 이름 */
+  userName: Scalars['String']
 }
 
 export type UpdateCellFieldsInput = {
@@ -571,6 +573,8 @@ export type UserChurchServiceHistoryInput = {
   isOnline: Scalars['Boolean']
   /** 사용자(셀원) 아이디 */
   userId: Scalars['ID']
+  /** 사용자(셀원) 이름 */
+  userName: Scalars['String']
 }
 
 export type FindChurchServicesQueryVariables = Exact<{ [key: string]: never }>
@@ -621,6 +625,7 @@ export type FindmyCellAttendanceQuery = {
         tempSavedAttendanceHistories: Array<{
           __typename?: 'TempSavedAttendanceHistory'
           userId: string
+          userName: string
           churchServiceId: string
           isOnline: boolean
           attendedAt: string
@@ -1009,6 +1014,7 @@ export const FindmyCellAttendanceDocument = `
       submitStatus
       tempSavedAttendanceHistories {
         userId
+        userName
         churchServiceId
         isOnline
         attendedAt

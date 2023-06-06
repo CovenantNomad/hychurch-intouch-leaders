@@ -13,11 +13,12 @@ import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai'
 import { classNames } from '@/utils/utils'
 import { useRecoilState } from 'recoil'
 import { attendanceState } from '@/stores/attendaceState'
-import { AttendanceStatus } from '@/types/attendance'
+import { AttendanceGlobalState, AttendanceStatus } from '@/types/attendance'
 import Spinner from '@/components/Atoms/Spinner'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
 import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
 import useAttendance from '@/hooks/useAttendance'
+import { toast } from 'react-hot-toast'
 
 interface onCheckHandlerPrps {
   checked: boolean
@@ -34,13 +35,26 @@ interface onToggleHandlerPrps {
 
 interface AttendanceFormProps {
   setStepIdx: Dispatch<SetStateAction<number>>
+  attendance: AttendanceGlobalState
+  onCheckHandler: ({
+    checked,
+    churchServiceId,
+    userId,
+    userName,
+  }: onCheckHandlerPrps) => void
+  onToggleHander: ({ userId, churchServiceId }: onToggleHandlerPrps) => void
 }
 
-const AttendanceForm = ({ setStepIdx }: AttendanceFormProps) => {
+const AttendanceForm = ({
+  setStepIdx,
+  attendance,
+  onCheckHandler,
+  onToggleHander,
+}: AttendanceFormProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const { attendance, setAttendance, onCheckHandler, onToggleHander } =
-    useAttendance()
+  // const { attendance, setAttendance, onCheckHandler, onToggleHander } =
+  //   useAttendance()
 
   const { isLoading: serviceLoading, data } = useFindChurchServicesQuery<
     FindChurchServicesQuery,
@@ -68,30 +82,13 @@ const AttendanceForm = ({ setStepIdx }: AttendanceFormProps) => {
     )
 
   const onSavingHandler = () => {
-    setModalOpen(false)
-    setStepIdx(1)
-  }
-
-  useEffect(() => {
-    setIsLoading(true)
-    if (!cellMemberLoading && cellMember) {
-      if (attendance.tempAttendanceList !== null && cellMember.myCellMembers) {
-        const mappedList = attendance.tempAttendanceList.map((item) => {
-          return {
-            ...item,
-            userName: cellMember.myCellMembers?.find(
-              (member) => member.id === item.userId
-            )?.name,
-          }
-        })
-        setAttendance({
-          ...attendance,
-          tempAttendanceList: mappedList,
-        })
-      }
+    if (attendance.tempAttendanceList === null) {
+      toast.error('출석명단을 체크하고 저장해주세요')
+    } else {
+      setStepIdx(1)
     }
-    setIsLoading(false)
-  }, [cellMemberLoading, cellMember])
+    setModalOpen(false)
+  }
 
   return (
     <div>
