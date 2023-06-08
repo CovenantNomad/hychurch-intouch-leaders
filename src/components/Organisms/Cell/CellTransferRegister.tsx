@@ -23,6 +23,7 @@ import { makeErrorMessage } from '@/utils/utils'
 import { getTodayString } from '@/utils/dateUtils'
 import dayjs from 'dayjs'
 import { FIND_CELLS_LIMIT } from '@/constants/constants'
+import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
 
 interface CellTransferRegisterProps {}
 
@@ -30,6 +31,7 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
   const now = dayjs()
   const queryClient = useQueryClient()
   const userInfo = useRecoilValue(stateUserInfo)
+  const [modalOpen, setModalOpen] = useState(false)
   const [datafilter, setDatafilter] = useState({
     min: getTodayString(dayjs(now.set('month', -1))),
     max: getTodayString(now),
@@ -159,11 +161,12 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
       mutate({
         input: submitData,
       })
+      setModalOpen(false)
     }
   }, [selectedCell, selectedPerson, userInfo, mutate])
 
   return (
-    <div>
+    <div className="relative">
       {isLoading ? (
         <div className="flex justify-center items-center py-20 lg:py-32">
           <Spinner />
@@ -188,7 +191,7 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
             <Summary
               header="Transfer Summary"
               label="Transfer"
-              onClick={onTransferHandler}
+              onClick={() => setModalOpen(true)}
             >
               <Summary.Row
                 title="이동 할 셀원"
@@ -199,6 +202,14 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
           </div>
         </div>
       )}
+      <SimpleModal
+        title={'셀원이동'}
+        description={`${selectedCell.name}로 '${selectedPerson.name}' 셀원을 이동하시겠습니까?`}
+        actionLabel={'이동'}
+        open={modalOpen}
+        setOpen={setModalOpen}
+        actionHandler={onTransferHandler}
+      />
     </div>
   )
 }

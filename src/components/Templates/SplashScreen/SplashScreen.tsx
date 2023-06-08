@@ -51,7 +51,9 @@ const SplashScreen = ({ onFinished }: SplashScreenProps) => {
     <Layout>
       <Container>
         <div className="flex items-center justify-center h-screen">
-          SplashScreen
+          <p className="text-black font-bold text-sm">
+            SHALOM IN<strong className="text-xl">✝︎</strong>OUCH
+          </p>
         </div>
       </Container>
     </Layout>

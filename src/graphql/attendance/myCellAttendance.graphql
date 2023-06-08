@@ -1,0 +1,36 @@
+query findmyCellAttendance($attendanceDate: String!) {
+  myCellAttendance(attendanceDate: $attendanceDate) {
+    __typename
+    ... on CellAttendanceNotSubmitted {
+      submitStatus
+    }
+    ... on CellAttendanceCompleted {
+      submitStatus
+      userChurchServiceHistories {
+        id
+        attendedAt
+        isOnline
+        description
+        user{
+          id
+          name
+        }
+        churchService {
+          id
+          name
+        }
+      }
+    }
+    ... on CellAttendanceTempSaved {
+      submitStatus
+      tempSavedAttendanceHistories{
+        userId
+        userName
+        churchServiceId
+        isOnline
+        attendedAt
+        description
+      }
+    }
+  }
+}

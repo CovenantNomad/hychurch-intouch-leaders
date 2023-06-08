@@ -1,4 +1,5 @@
 import { UserCellTransferStatus } from '@/graphql/generated'
+import { TempSavedAttendanceHistory } from '@/types/attendance'
 import { Member } from '@/types/member'
 
 export function groupBy(list: Member[]) {
@@ -33,4 +34,34 @@ export const getTransferStatus = (state: UserCellTransferStatus) => {
     default:
       break
   }
+}
+
+export const getServiceName = (churchServiceId: string) => {
+  const churchServiceNameList = [
+    '1부예배',
+    '2부예배',
+    '3부예배',
+    '4부예배',
+    '청년예배',
+  ]
+  return churchServiceNameList[Number(churchServiceId) - 1]
+}
+
+export function groupByChurchService(list: TempSavedAttendanceHistory[]) {
+  let init: {
+    serviceId: string
+    tempAttendanceList: TempSavedAttendanceHistory[]
+  }[] = [
+    { serviceId: '1', tempAttendanceList: [] },
+    { serviceId: '2', tempAttendanceList: [] },
+    { serviceId: '3', tempAttendanceList: [] },
+    { serviceId: '4', tempAttendanceList: [] },
+    { serviceId: '5', tempAttendanceList: [] },
+  ]
+  return list.reduce((acc, cur: TempSavedAttendanceHistory) => {
+    const { churchServiceId } = cur
+    const index = acc.findIndex((item) => item.serviceId === churchServiceId)
+    acc[index].tempAttendanceList.push(cur)
+    return acc
+  }, init)
 }

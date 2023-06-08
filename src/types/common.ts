@@ -12,3 +12,9 @@ export enum SpecialCellIdType {
   /** 새싹셀 (이찬양) */
   Renew = '44',
 }
+
+export enum StepStatus {
+  COMPLETE = 'complete',
+  CURRENT = 'current',
+  UPCOMING = 'upcoming',
+}

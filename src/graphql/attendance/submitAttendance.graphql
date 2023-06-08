@@ -1,0 +1,7 @@
+mutation submitAttendance(
+  $input: SubmitCellMemberChurchServiceAttendanceHistoriesInput!
+) {
+  submitCellMemberChurchServiceAttendanceHistories(input: $input) {
+    success
+  }
+}
