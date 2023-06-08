@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import { useRecoilValue } from 'recoil'
 import { stateUserInfo } from '@/stores/stateUserInfo'
@@ -20,12 +20,6 @@ import Spinner from '@/components/Atoms/Spinner'
 //etc..
 import { AttendanceSteps } from '@/constants/menu'
 import { AttendanceStatus } from '@/types/attendance'
-import {
-  FindmyCellAttendanceQuery,
-  FindmyCellAttendanceQueryVariables,
-  useFindmyCellAttendanceQuery,
-} from '@/graphql/generated'
-import graphlqlRequestClient from '@/client/graphqlRequestClient'
 
 interface AttendanceProps {}
 
@@ -86,7 +80,10 @@ const AttendancePage = ({}: AttendanceProps) => {
         />
         <Spacer size={'h-6 lg:h-8'} />
         {attendance.status === AttendanceStatus.COMPLETE ? (
-          <SuccessAlerts description="이번주 출석체크 제출을 완료하였습니다." />
+          <>
+            <SuccessAlerts description="이번주 출석체크 제출을 완료하였습니다." />
+            <AttendanceComplete attendance={attendance} />
+          </>
         ) : (
           <>
             {attendance.status === AttendanceStatus.NOT_SUBMITTED && (

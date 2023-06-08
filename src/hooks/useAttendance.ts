@@ -57,7 +57,6 @@ const useAttendance = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      console.log('useEffect 작동됨')
       switch (data?.myCellAttendance.__typename) {
         case 'CellAttendanceNotSubmitted':
           setAttendance({
