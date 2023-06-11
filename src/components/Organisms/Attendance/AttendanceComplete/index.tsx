@@ -13,6 +13,8 @@ const AttendanceComplete = ({ attendance }: AttendanceCompleteProps) => {
     router.push('/home')
   }, [])
 
+  console.log(attendance)
+
   return (
     <div>
       <h6 className="mt-8 underline-offset-4 underline">
@@ -33,11 +35,11 @@ const AttendanceComplete = ({ attendance }: AttendanceCompleteProps) => {
                 <span
                   className={`rounded-md whitespace-nowrap ml-2.5 px-1.5 py-0.5 text-xs font-medium ${
                     item.isOnline
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'bg-red-50 text-red-700'
+                      ? 'bg-red-50 text-red-700'
+                      : 'bg-blue-50 text-blue-700'
                   }`}
                 >
-                  {item.isOnline ? '성전' : '온라인'}
+                  {item.isOnline ? '온라인' : '성전'}
                 </span>
               </p>
             </li>
