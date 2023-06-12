@@ -122,7 +122,11 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
           (member) =>
             !member.roles.includes(RoleType.CellLeader) &&
             !data.findCell.transfersOut
-              .map((transferedUser) => transferedUser.user.id)
+              .map(
+                (transferedUser) =>
+                  transferedUser.status === UserCellTransferStatus.Ordered &&
+                  transferedUser.user.id
+              )
               .includes(member.id)
         )
         .map((member) => {
