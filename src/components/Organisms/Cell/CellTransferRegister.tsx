@@ -33,7 +33,7 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
   const userInfo = useRecoilValue(stateUserInfo)
   const [modalOpen, setModalOpen] = useState(false)
   const [datafilter, setDatafilter] = useState({
-    min: getTodayString(dayjs(now.set('month', -1))),
+    min: getTodayString(now.subtract(1, 'month')),
     max: getTodayString(now),
   })
   const [memberList, setMemberList] = useState<SelectType[]>([])
@@ -96,6 +96,9 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
             },
           },
         ],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['findUserCellTransferResult'],
       })
       setSelectedPerson({
         id: '',
