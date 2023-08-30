@@ -17,16 +17,19 @@ import CellTransferHistoryListItem from './CellTransferHistoryListItem'
 import Spacer from '@/components/Atoms/Spacer'
 import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import EmptyStateStarting from '@/components/Atoms/EmptyStates/EmptyStateStarting'
+import SearchFilterModal from '@/components/Atoms/Modals/SearchFilterModal'
 
 interface CellTransferHistoryProps {}
 
 const CellTransferHistory = ({}: CellTransferHistoryProps) => {
   const now = dayjs()
   const userInfo = useRecoilValue(stateUserInfo)
-  const [datafilter, setDatafilter] = useState({
-    min: getTodayString(dayjs(now.set('month', -1))),
+  const [datefilter, setDatefilter] = useState({
+    min: getTodayString(now.subtract(1, 'month')),
     max: getTodayString(now),
   })
+
+  const [openSearchFilterModal, setOpenSearchFilterModal] = useState(false)
 
   const { data, isLoading } = useFindUserCellTransferResultQuery<
     FindUserCellTransferResultQuery,
@@ -42,12 +45,19 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
       ],
       transferInDateFilter: {
         between: {
-          min: datafilter.min,
-          max: datafilter.max,
+          min: datefilter.min,
+          max: datefilter.max,
+        },
+      },
+      transferOutDateFilter: {
+        between: {
+          min: datefilter.min,
+          max: datefilter.max,
         },
       },
     },
     {
+      enabled: Boolean(datefilter.min),
       staleTime: 5 * 60 * 1000,
       cacheTime: 10 * 60 * 1000,
     }
@@ -61,7 +71,22 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
         </div>
       ) : (
         <div>
-          <ListTitleText>Transfer-In</ListTitleText>
+          <div className="flex justify-between border-b border-black pb-3 mb-4">
+            <p>
+              {datefilter.min.replace('-', '.')} ~{' '}
+              {datefilter.max.replace('-', '.')}
+            </p>
+            <div>
+              <button
+                type="button"
+                onClick={() => setOpenSearchFilterModal(true)}
+                className="cursor-pointer"
+              >
+                조회기간 설정
+              </button>
+            </div>
+          </div>
+          <ListTitleText>받은 셀원</ListTitleText>
           <div className="py-6">
             {data?.findCell.transfersIn.length !== 0 ? (
               data?.findCell.transfersIn.map((item) => (
@@ -69,13 +94,13 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
               ))
             ) : (
               <EmptyStateStarting
-                title="요청 사항이 없습니다"
-                descrtiption="우리 셀로 배정신청 된 사항이 없습니다"
+                title="조회 내용이 없습니다"
+                descrtiption="우리 셀로 배정신청 된 셀원이 없습니다"
               />
             )}
           </div>
           <Spacer size="h-4" />
-          <ListTitleText>Transfer-Out</ListTitleText>
+          <ListTitleText>보낸 셀원</ListTitleText>
           <p className="mt-6 text-slate-600 text-sm">승인대기 상태</p>
           <div className={`bg-gray-50 py-6`}>
             {data?.findCell.transfersOut.filter(
@@ -90,8 +115,8 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
                 ))
             ) : (
               <EmptyStateStarting
-                title="요청 사항이 없습니다"
-                descrtiption="승인대기 중인 사항이 없습니다"
+                title="조회 내용이 없습니다"
+                descrtiption="다른 셀에서 승인대기 중인 셀원이 없습니다"
               />
             )}
           </div>
@@ -109,14 +134,21 @@ const CellTransferHistory = ({}: CellTransferHistoryProps) => {
                 ))
             ) : (
               <EmptyStateStarting
-                title="요청 사항이 없습니다"
-                descrtiption="우리 셀에서 이동신청 된 사항이 없습니다"
+                title="조회 내용이 없습니다"
+                descrtiption="조회기간 내 다른 셀로 보낸 셀원이 없습니다"
               />
             )}
           </div>
           <Spacer size="h-16" />
         </div>
       )}
+      <SearchFilterModal
+        open={openSearchFilterModal}
+        setOpen={setOpenSearchFilterModal}
+        now={now}
+        datefilter={datefilter}
+        setDateFilter={setDatefilter}
+      />
     </div>
   )
 }
