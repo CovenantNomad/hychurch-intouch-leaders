@@ -1,0 +1,18 @@
+query findUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    registrationDate
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}

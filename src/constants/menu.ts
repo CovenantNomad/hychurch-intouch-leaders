@@ -32,10 +32,10 @@ export const mainMenu: menuType[] = [
   },
   {
     id: 3,
-    title: '설문조사',
+    title: '달란트통장',
     icon: '✍️',
     color: '#F9E8E5',
-    pathname: '/survey',
+    pathname: '/dallants',
   },
 ]
 
