@@ -756,6 +756,28 @@ export type FindMyCellMembersQuery = {
   }> | null
 }
 
+export type FindUserQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type FindUserQuery = {
+  __typename?: 'Query'
+  user: {
+    __typename?: 'User'
+    id: string
+    name: string
+    phone: string
+    isActive: boolean
+    birthday?: string | null
+    gender?: Gender | null
+    address?: string | null
+    description?: string | null
+    registrationDate?: string | null
+    roles: Array<RoleType>
+    cell?: { __typename?: 'Cell'; id: string; name: string } | null
+  }
+}
+
 export type FindUserCellTransferRegisterQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']>
   id: Scalars['Float']
@@ -1319,6 +1341,47 @@ useFindMyCellMembersQuery.getKey = (
   variables === undefined
     ? ['findMyCellMembers']
     : ['findMyCellMembers', variables]
+export const FindUserDocument = `
+    query findUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    phone
+    isActive
+    birthday
+    gender
+    address
+    description
+    registrationDate
+    roles
+    cell {
+      id
+      name
+    }
+  }
+}
+    `
+export const useFindUserQuery = <TData = FindUserQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: FindUserQueryVariables,
+  options?: UseQueryOptions<FindUserQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindUserQuery, TError, TData>(
+    ['findUser', variables],
+    fetcher<FindUserQuery, FindUserQueryVariables>(
+      client,
+      FindUserDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useFindUserQuery.getKey = (variables: FindUserQueryVariables) => [
+  'findUser',
+  variables,
+]
 export const FindUserCellTransferRegisterDocument = `
     query findUserCellTransferRegister($limit: Int, $id: Float!, $transferOutStatus: [UserCellTransferStatus!], $transferOutDateFilter: DateFilter) {
   findCells(limit: $limit) {

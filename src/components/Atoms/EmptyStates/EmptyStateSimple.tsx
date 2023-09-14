@@ -6,7 +6,7 @@ interface EmptyStateSimpleProps {
 
 const EmptyStateSimple = ({ warning }: EmptyStateSimpleProps) => {
   return (
-    <div className="text-center bg-white py-4">
+    <div className="text-center py-4">
       <svg
         className="mx-auto h-12 w-12 text-gray-400"
         fill="none"
