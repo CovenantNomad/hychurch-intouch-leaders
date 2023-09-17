@@ -2,14 +2,13 @@ import toast from 'react-hot-toast'
 import { db } from '@/client/firebaseConfig'
 import { DALLANTS_COLLCTION } from '@/constants/constants'
 import {
-  DallantAccountType,
   DallantCellWithMemberType,
   DallantHistoryType,
   DallantMemberType,
 } from '@/types/dallant'
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
 
-export const getCellDallant = async (cellId: string) => {
+export const getCellDallant = async (cellId: string | null) => {
   try {
     const DallantSettingRef = doc(
       db,
@@ -30,51 +29,53 @@ export const getCellDallant = async (cellId: string) => {
           members: [],
         }
 
-        const cellRef = doc(
-          db,
-          DALLANTS_COLLCTION.DALLENTS,
-          seasonName,
-          DALLANTS_COLLCTION.CELLS,
-          cellId
-        )
-        const cellDoc = await getDoc(cellRef)
-
-        if (cellDoc.exists()) {
-          const membersRef = collection(
+        if (cellId !== null) {
+          const cellRef = doc(
             db,
             DALLANTS_COLLCTION.DALLENTS,
             seasonName,
             DALLANTS_COLLCTION.CELLS,
-            cellId,
-            DALLANTS_COLLCTION.MEMBERS
+            cellId
           )
-          const memberQuerySnapshot = await getDocs(membersRef)
+          const cellDoc = await getDoc(cellRef)
 
-          if (!memberQuerySnapshot.empty) {
-            let membersTemp: DallantMemberType[] = []
+          if (cellDoc.exists()) {
+            const membersRef = collection(
+              db,
+              DALLANTS_COLLCTION.DALLENTS,
+              seasonName,
+              DALLANTS_COLLCTION.CELLS,
+              cellId,
+              DALLANTS_COLLCTION.MEMBERS
+            )
+            const memberQuerySnapshot = await getDocs(membersRef)
 
-            memberQuerySnapshot.forEach((member) => {
-              membersTemp.push({
-                userId: member.data().userId,
-                userName: member.data().userName,
-                totalAmount: member.data().totalAmount,
+            if (!memberQuerySnapshot.empty) {
+              let membersTemp: DallantMemberType[] = []
+
+              memberQuerySnapshot.forEach((member) => {
+                membersTemp.push({
+                  userId: member.data().userId,
+                  userName: member.data().userName,
+                  totalAmount: member.data().totalAmount,
+                })
               })
-            })
 
-            resultTemp = {
-              cellId: cellId,
-              cellName: cellDoc.data().cellName,
-              community: cellDoc.data().community,
-              totalAmount: cellDoc.data().totalAmount,
-              members: membersTemp,
-            }
-          } else {
-            resultTemp = {
-              cellId: cellId,
-              cellName: cellDoc.data().cellName,
-              community: cellDoc.data().community,
-              totalAmount: cellDoc.data().totalAmount,
-              members: [],
+              resultTemp = {
+                cellId: cellId,
+                cellName: cellDoc.data().cellName,
+                community: cellDoc.data().community,
+                totalAmount: cellDoc.data().totalAmount,
+                members: membersTemp,
+              }
+            } else {
+              resultTemp = {
+                cellId: cellId,
+                cellName: cellDoc.data().cellName,
+                community: cellDoc.data().community,
+                totalAmount: cellDoc.data().totalAmount,
+                members: [],
+              }
             }
           }
         }
