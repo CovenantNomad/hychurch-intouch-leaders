@@ -5,6 +5,7 @@ import { getUserDallantHistory } from '@/firebase/dallant/dallant'
 import Container from '@/components/Atoms/Container/Container'
 import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import { convertSecondToDate } from '@/utils/dateUtils'
 
 interface UserDallantHistoryProps {
   id: string
@@ -16,8 +17,8 @@ const UserDallantHistory = ({ id }: UserDallantHistoryProps) => {
     () => getUserDallantHistory(id),
     {
       enabled: !!id,
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      staleTime: 15 * 60 * 1000,
+      cacheTime: 30 * 60 * 1000,
     }
   )
 
@@ -48,41 +49,44 @@ const UserDallantHistory = ({ id }: UserDallantHistoryProps) => {
       ) : (
         <div>
           {data ? (
-            <div className="divide-y divide-gray-100">
-              {data
-                .sort((a, b) => {
-                  const dateA = new Date(a.createdAt)
-                  const dateB = new Date(b.createdAt)
-                  return dateB.getTime() - dateA.getTime()
-                })
-                .map((history, index) => (
-                  <div key={history.docId} className="flex items-start py-4">
-                    <div className="pr-5">
-                      <p className="text-base text-gray-400 font-sans">
-                        {history.createdAt.split('-')[1]}.
-                        {history.createdAt.split('-')[2]}
-                      </p>
+            <ul role="list" className="pt-4 divide-y divide-[#dcdee0]">
+              {data.map((transaction, index) => (
+                <li key={transaction.docId} className="flex">
+                  <div className="min-w-[52px] pt-5 text-sm">
+                    {transaction.createdAt.split('-')[1]}.
+                    {transaction.createdAt.split('-')[2]}
+                  </div>
+                  <div className="w-full pt-5 pb-5">
+                    <div className="flex justify-between item-center">
+                      <div>
+                        <span className="text-base font-normal">
+                          {transaction.description}
+                        </span>
+                      </div>
+                      <div>
+                        <strong className="font-sans text-blue-500">
+                          {transaction.totalAmount} D
+                        </strong>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-base font-sans leading-6">
-                        {history.description}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg text-blue-600 font-sans font-extrabold leading-6">
-                        {history.amount.toLocaleString('kr-KR')} D
-                      </p>
-                      <p className="text-gray-400 font-sans">
-                        {data
-                          .slice(0, index + 1)
-                          .reduce((sum, item) => sum + item.amount, 0)
-                          .toLocaleString('kr-KR')}{' '}
-                        D
-                      </p>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-xs font-sans text-sky-700">
+                          {convertSecondToDate(
+                            transaction.createdTimestamp.seconds
+                          ).format('YYYY.MM.DD HH:mm:ss')}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-sm font-sans text-gray-500">
+                          {transaction.amount} D 적립
+                        </span>
+                      </div>
                     </div>
                   </div>
-                ))}
-            </div>
+                </li>
+              ))}
+            </ul>
           ) : (
             <div className="py-4">
               <EmptyStateSimple />

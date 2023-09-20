@@ -6,3 +6,7 @@ export const getTodayString = (date: dayjs.Dayjs) => {
     .toString()
     .padStart(2, '0')}-${date.date().toString().padStart(2, '0')}`
 }
+
+export const convertSecondToDate = (seconds: number) => {
+  return dayjs(seconds * 1000)
+}

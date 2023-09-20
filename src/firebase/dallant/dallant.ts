@@ -6,9 +6,16 @@ import {
   DallantHistoryType,
   DallantMemberType,
 } from '@/types/dallant'
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+} from 'firebase/firestore'
 
-export const getCellDallant = async (cellId: string | null) => {
+export const getCellDallant = async (cellId: string) => {
   try {
     const DallantSettingRef = doc(
       db,
@@ -29,53 +36,51 @@ export const getCellDallant = async (cellId: string | null) => {
           members: [],
         }
 
-        if (cellId !== null) {
-          const cellRef = doc(
+        const cellRef = doc(
+          db,
+          DALLANTS_COLLCTION.DALLENTS,
+          seasonName,
+          DALLANTS_COLLCTION.CELLS,
+          cellId
+        )
+        const cellDoc = await getDoc(cellRef)
+
+        if (cellDoc.exists()) {
+          const membersRef = collection(
             db,
             DALLANTS_COLLCTION.DALLENTS,
             seasonName,
             DALLANTS_COLLCTION.CELLS,
-            cellId
+            cellId,
+            DALLANTS_COLLCTION.MEMBERS
           )
-          const cellDoc = await getDoc(cellRef)
+          const memberQuerySnapshot = await getDocs(membersRef)
 
-          if (cellDoc.exists()) {
-            const membersRef = collection(
-              db,
-              DALLANTS_COLLCTION.DALLENTS,
-              seasonName,
-              DALLANTS_COLLCTION.CELLS,
-              cellId,
-              DALLANTS_COLLCTION.MEMBERS
-            )
-            const memberQuerySnapshot = await getDocs(membersRef)
+          if (!memberQuerySnapshot.empty) {
+            let membersTemp: DallantMemberType[] = []
 
-            if (!memberQuerySnapshot.empty) {
-              let membersTemp: DallantMemberType[] = []
-
-              memberQuerySnapshot.forEach((member) => {
-                membersTemp.push({
-                  userId: member.data().userId,
-                  userName: member.data().userName,
-                  totalAmount: member.data().totalAmount,
-                })
+            memberQuerySnapshot.forEach((member) => {
+              membersTemp.push({
+                userId: member.data().userId,
+                userName: member.data().userName,
+                totalAmount: member.data().totalAmount,
               })
+            })
 
-              resultTemp = {
-                cellId: cellId,
-                cellName: cellDoc.data().cellName,
-                community: cellDoc.data().community,
-                totalAmount: cellDoc.data().totalAmount,
-                members: membersTemp,
-              }
-            } else {
-              resultTemp = {
-                cellId: cellId,
-                cellName: cellDoc.data().cellName,
-                community: cellDoc.data().community,
-                totalAmount: cellDoc.data().totalAmount,
-                members: [],
-              }
+            resultTemp = {
+              cellId: cellId,
+              cellName: cellDoc.data().cellName,
+              community: cellDoc.data().community,
+              totalAmount: cellDoc.data().totalAmount,
+              members: membersTemp,
+            }
+          } else {
+            resultTemp = {
+              cellId: cellId,
+              cellName: cellDoc.data().cellName,
+              community: cellDoc.data().community,
+              totalAmount: cellDoc.data().totalAmount,
+              members: [],
             }
           }
         }
@@ -83,9 +88,12 @@ export const getCellDallant = async (cellId: string | null) => {
         return resultTemp
       }
     }
+
+    return null
   } catch (error: any) {
     console.log('@getCellDallant Error: ', error)
     toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+    return null
   }
 }
 
@@ -151,7 +159,11 @@ export const getUserDallantHistory = async (userId: string) => {
           userId,
           DALLANTS_COLLCTION.HISTORY
         )
-        const historyQuerySnapshot = await getDocs(historyRef)
+        const historyQuery = query(
+          historyRef,
+          orderBy('createdTimestamp', 'desc')
+        )
+        const historyQuerySnapshot = await getDocs(historyQuery)
 
         if (!historyQuerySnapshot.empty) {
           let historyTemp: DallantHistoryType[] = []
@@ -166,8 +178,11 @@ export const getUserDallantHistory = async (userId: string) => {
         }
       }
     }
+
+    return null
   } catch (error: any) {
     console.log('@getUserDallantHistory Error: ', error)
     toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+    return null
   }
 }
