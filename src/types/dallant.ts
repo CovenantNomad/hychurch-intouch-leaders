@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore'
 import { Member } from './member'
 
 // Firebase CELL Document
@@ -40,7 +41,8 @@ export interface DallantHistoryType {
   amount: number
   description: string
   createdAt: string
-  updatedAt?: string
+  createdTimestamp: Timestamp
+  totalAmount: number
 }
 
 export interface UserDallantHeaderViewDataType extends DallantAccountType {

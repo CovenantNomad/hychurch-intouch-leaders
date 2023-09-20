@@ -8,37 +8,43 @@ import {
   RoleType,
   useFindUserQuery,
 } from '@/graphql/generated'
-import { DallantCellType, UserDallantHeaderViewDataType } from '@/types/dallant'
+import { UserDallantHeaderViewDataType } from '@/types/dallant'
 
 const useUserDallant = (userId: string) => {
   const [isLoading, setIsLoading] = useState(true)
   const [userInfo, setUserInfo] =
     useState<UserDallantHeaderViewDataType | null>(null)
 
-  const { isLoading: isUserLoading, data: userData } = useFindUserQuery<
-    FindUserQuery,
-    FindUserQueryVariables
-  >(
+  const {
+    isLoading: isUserLoading,
+    isFetching: isUserFetching,
+    data: userData,
+  } = useFindUserQuery<FindUserQuery, FindUserQueryVariables>(
     graphlqlRequestClient,
     { id: userId },
     {
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      staleTime: 15 * 60 * 1000,
+      cacheTime: 30 * 60 * 1000,
     }
   )
 
-  const { isLoading: isAccountLoading, data: accountData } = useQuery(
-    ['getUserAccount', userId],
-    () => getUserAccount(userId),
-    {
-      enabled: !!userId,
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
-    }
-  )
+  const {
+    isLoading: isAccountLoading,
+    isFetching: isAccountFetching,
+    data: accountData,
+  } = useQuery(['getUserAccount', userId], () => getUserAccount(userId), {
+    enabled: !!userId,
+    staleTime: 15 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+  })
 
   useEffect(() => {
-    if (!isUserLoading && !isAccountLoading) {
+    if (
+      !isUserLoading &&
+      !isAccountLoading &&
+      !isAccountFetching &&
+      !isUserFetching
+    ) {
       if (userData && userData.user && accountData) {
         setUserInfo({
           cellId: userData.user.cell?.id || '999',
@@ -64,7 +70,14 @@ const useUserDallant = (userId: string) => {
     } else {
       setIsLoading(true)
     }
-  }, [isUserLoading, userData, isAccountLoading, accountData])
+  }, [
+    isUserLoading,
+    isUserFetching,
+    userData,
+    isAccountLoading,
+    isAccountFetching,
+    accountData,
+  ])
 
   return {
     isLoading,
