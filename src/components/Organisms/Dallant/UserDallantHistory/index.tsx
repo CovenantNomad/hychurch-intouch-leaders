@@ -51,7 +51,7 @@ const UserDallantHistory = ({ id }: UserDallantHistoryProps) => {
           {data ? (
             <ul role="list" className="pt-4 divide-y divide-[#dcdee0]">
               {data.map((transaction, index) => (
-                <li key={transaction.docId} className="flex">
+                <li key={index} className="flex">
                   <div className="min-w-[52px] pt-5 text-sm">
                     {transaction.createdAt.split('-')[1]}.
                     {transaction.createdAt.split('-')[2]}

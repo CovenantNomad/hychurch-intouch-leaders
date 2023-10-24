@@ -8,6 +8,7 @@ export interface menuType {
   pathname: string
 }
 
+// mainMenu
 export const mainMenu: menuType[] = [
   {
     id: 0,
@@ -39,6 +40,7 @@ export const mainMenu: menuType[] = [
   },
 ]
 
+// 셀원관리 메뉴
 export const cellMenu = [
   {
     id: 0,
@@ -66,4 +68,18 @@ export const cellTransferTabs = [
 export const AttendanceSteps = [
   { id: 0, title: '출석체크' },
   { id: 1, title: '검토' },
+]
+
+// 달란트 메뉴
+export const dallantMenu = [
+  {
+    id: 0,
+    title: '인터치 뱅크',
+    icon: '💳',
+  },
+  {
+    id: 1,
+    title: '인터치 잇츠',
+    icon: '🍽️',
+  },
 ]
