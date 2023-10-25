@@ -7,7 +7,7 @@ import InformationAlerts from '@/components/Atoms/Alerts/InformationAlerts'
 import CellDayOrderListItem from '@/components/Organisms/Dallant/CellDayOrderListItem/CellDayOrderListItem'
 import CellDayTotalPayment from '@/components/Organisms/Dallant/CellDayTotalPayment/CellDayTotalPayment'
 import { ShoppingCartIcon } from '@heroicons/react/24/outline'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createOrder } from '@/firebase/dallant/cellday'
 import { CartType } from '@/types/cellday'
 
@@ -16,10 +16,14 @@ interface CellDayCartScreenProps {
 }
 
 const CellDayCartScreen = ({ setTabIdx }: CellDayCartScreenProps) => {
+  const queryClient = useQueryClient()
   const { cart, onResetCart } = useShoppingCart()
   const { isLoading, cellInfo } = useCellDallant()
   const mutation = useMutation<void, [string, CartType]>({
     mutationFn: () => createOrder(cellInfo!.cellId, cart),
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ['getOrderStatement'] })
+    },
   })
 
   const onSubmitOrder = async () => {

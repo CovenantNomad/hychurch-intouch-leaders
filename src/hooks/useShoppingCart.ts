@@ -14,7 +14,14 @@ const useShoppingCart = () => {
   const [cart, setCart] = useRecoilState(cellDayCartState)
 
   const onAddToCart = ({
-    menu: { menuId, menuName, menuDescription, menuPrice, menuImageUrl },
+    menu: {
+      menuId,
+      menuName,
+      menuDescription,
+      menuPrice,
+      menuImageUrl,
+      restaurantId,
+    },
     amount,
   }: onAddToCartProps) => {
     const existingItemIndex = cart.cartItems.findIndex(
@@ -62,6 +69,7 @@ const useShoppingCart = () => {
           menuDescription,
           menuPrice,
           menuImageUrl,
+          restaurantId,
         },
         itemQuantity: String(amount),
         itemPrice: String(price),

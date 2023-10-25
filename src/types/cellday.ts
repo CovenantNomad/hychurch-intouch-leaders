@@ -18,6 +18,7 @@ export interface MenuType {
   menuDescription?: string
   menuPrice: string
   menuImageUrl: string
+  restaurantId: string
 }
 
 export interface CartItemType {

@@ -12,6 +12,7 @@ interface CellDayMenuBodyProps {
   menuDescription?: string
   menuPrice: string
   menuImageUrl: string
+  restaurantId: string
 }
 
 const CellDayMenuBody = ({
@@ -20,6 +21,7 @@ const CellDayMenuBody = ({
   menuDescription,
   menuPrice,
   menuImageUrl,
+  restaurantId,
 }: CellDayMenuBodyProps) => {
   const [amount, setAmount] = useState<number>(1)
   const { onAddToCart } = useShoppingCart()
@@ -32,7 +34,9 @@ const CellDayMenuBody = ({
       <div className="py-6 border-b border-b-gray-300">
         <Container>
           <h4 className="text-xl font-bold">{menuName}</h4>
-          <p className="text-sm text-gray-500 mt-1">{menuDescription}</p>
+          {menuDescription && (
+            <p className="text-sm text-gray-500 mt-1">{menuDescription}</p>
+          )}
         </Container>
       </div>
       <Container>
@@ -48,11 +52,11 @@ const CellDayMenuBody = ({
                 <button
                   disabled={amount <= 0}
                   onClick={() => setAmount(amount - 1)}
-                  className="p-2 rounded-full border border-gray-400 disabled:border-gray-200"
+                  className="p-2 rounded-full border border-gray-400 cursor-pointer disabled:border-gray-200"
                 >
                   <MinusIcon
                     className={`h-4 w-4 ${
-                      amount <= 0 ? 'text-gray-200' : 'text-gray-400'
+                      amount <= 0 ? 'text-gray-200' : 'text-gray-600'
                     }`}
                   />
                 </button>
@@ -60,11 +64,11 @@ const CellDayMenuBody = ({
                 <button
                   disabled={amount >= 3}
                   onClick={() => setAmount(amount + 1)}
-                  className="p-2 rounded-full border border-gray-400 disabled:border-gray-200"
+                  className="p-2 rounded-full border border-gray-400 cursor-pointer disabled:border-gray-200"
                 >
                   <PlusIcon
                     className={`h-4 w-4 ${
-                      amount > 3 ? 'text-gray-200' : 'text-gray-400'
+                      amount > 3 ? 'text-gray-200' : 'text-gray-600'
                     }`}
                   />
                 </button>
@@ -90,6 +94,7 @@ const CellDayMenuBody = ({
                   menuDescription,
                   menuPrice,
                   menuImageUrl,
+                  restaurantId,
                 },
                 amount,
               })

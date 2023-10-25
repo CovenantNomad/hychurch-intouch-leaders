@@ -45,6 +45,7 @@ const CellDayMenuDetailScreen = ({}: CellDayMenuDetailScreenProps) => {
             menuDescription={String(menuDescription)}
             menuPrice={String(menuPrice)}
             menuImageUrl={String(menuImageUrl)}
+            restaurantId={String(restaurantId)}
           />
         </>
       </div>
@@ -54,7 +55,12 @@ const CellDayMenuDetailScreen = ({}: CellDayMenuDetailScreenProps) => {
   return (
     <div>
       {isLoading || isFetching ? (
-        <div>로딩중</div>
+        <div className="animate-pulse">
+          <div className="animate-pulse w-full h-[300px] bg-gray-200" />
+          <div className="w-1/6 h-1.5 bg-gray-200 mt-6 ml-4" />
+          <div className="w-1/2 h-1.5 bg-gray-200 mt-6 ml-4" />
+          <div className="w-1/3 h-1.5 bg-gray-200 mt-6 ml-4" />
+        </div>
       ) : (
         <>
           {data ? (
@@ -69,6 +75,7 @@ const CellDayMenuDetailScreen = ({}: CellDayMenuDetailScreenProps) => {
                 menuDescription={data.menuDescription}
                 menuPrice={data.menuPrice}
                 menuImageUrl={data.menuImageUrl}
+                restaurantId={data.restaurantId}
               />
             </>
           ) : (

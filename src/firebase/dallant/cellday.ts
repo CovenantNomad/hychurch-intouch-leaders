@@ -65,6 +65,7 @@ export const getRestaurants = async () => {
                   menuDescription: menu.data().menuDescription,
                   menuPrice: menu.data().menuPrice,
                   menuImageUrl: menu.data().menuImageUrl,
+                  restaurantId: restaurant.id,
                 })
               })
               restaurantList.push({
@@ -128,6 +129,7 @@ export const getMenuById = async (restaurantId: string, menuId: string) => {
             menuDescription: menuDoc.data().menuDescription,
             menuPrice: menuDoc.data().menuPrice,
             menuImageUrl: menuDoc.data().menuImageUrl,
+            restaurantId: restaurantId,
           }
 
           return menu
@@ -206,7 +208,9 @@ export const createOrder = async (cellId: string, orderDocument: CartType) => {
                 ),
                 {
                   menuId: item.orderedMenuItem.menuId,
-                  orderUnits: item.itemQuantity,
+                  menuName: item.orderedMenuItem.menuName,
+                  restaurantId: item.orderedMenuItem.restaurantId,
+                  orderUnits: Number(item.itemQuantity),
                 }
               )
             } else {
