@@ -13,4 +13,10 @@ export enum DALLANTS_COLLCTION {
   OVERALL = 'Overall',
   CELLSTATISTIC = 'CellStatistic',
   SETTINGS = 'Settings',
+  RESTAURANTS = 'Restaurants',
+  MENUS = 'Menus',
+  ORDER = 'Order',
+  ORDERSTOCK = 'OrderStock',
 }
+
+export const MAX_ORDER_NUMBER = 3

@@ -1,6 +1,12 @@
 import { Timestamp } from 'firebase/firestore'
 import { Member } from './member'
 
+export interface DallantsSettingType {
+  isActivity: boolean
+  isCellDayOpen: boolean
+  currentSeasonName: string
+}
+
 // Firebase CELL Document
 export interface DallantCellType {
   cellId: string

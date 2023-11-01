@@ -5,10 +5,10 @@ import useCellDallant from '@/hooks/useCellDallant'
 import { useRecoilValue } from 'recoil'
 import { stateUserInfo } from '@/stores/stateUserInfo'
 //components
-import Container from '@/components/Atoms/Container/Container'
 import Spacer from '@/components/Atoms/Spacer'
 import CellDallantHeader from '@/components/Organisms/Dallant/CellDallantHeader'
 import CellDallantList from '@/components/Organisms/Dallant/CellDallantList'
+import Container from '@/components/Atoms/Container/Container'
 
 interface CellDallantScreenProps {}
 
@@ -25,7 +25,7 @@ const CellDallantScreen = ({}: CellDallantScreenProps) => {
           달란트 통장
         </span>
       </h2>
-      <Spacer size={'h-8'} />
+      <Spacer size={'h-6'} />
       <CellDallantHeader isLoading={isLoading} cellInfo={cellInfo} />
       <Spacer size={'h-4 lg:h-8'} />
       <h3 className="text-lg font-sans font-medium">셀원 달란트 통장</h3>

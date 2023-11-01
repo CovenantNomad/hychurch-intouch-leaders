@@ -5,6 +5,7 @@ import {
   DallantCellWithMemberType,
   DallantHistoryType,
   DallantMemberType,
+  DallantsSettingType,
 } from '@/types/dallant'
 import {
   collection,
@@ -14,6 +15,22 @@ import {
   orderBy,
   query,
 } from 'firebase/firestore'
+
+export const getDallentSetting = async () => {
+  try {
+    const DallantSettingRef = doc(
+      db,
+      DALLANTS_COLLCTION.DALLENTS,
+      DALLANTS_COLLCTION.SETTINGS
+    )
+    const docSnap = await getDoc(DallantSettingRef)
+
+    return docSnap.data() as DallantsSettingType
+  } catch (error: any) {
+    console.log(error)
+    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+  }
+}
 
 export const getCellDallant = async (cellId: string) => {
   try {
