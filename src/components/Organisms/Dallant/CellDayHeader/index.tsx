@@ -18,10 +18,6 @@ const tabs = [
     id: 1,
     name: '주문현황',
   },
-  {
-    id: 2,
-    name: '공지사항',
-  },
 ]
 
 const CellDayHeader = ({ tabIdx, setTabIdx }: CellDayHeaderProps) => {
@@ -47,7 +43,7 @@ const CellDayHeader = ({ tabIdx, setTabIdx }: CellDayHeaderProps) => {
         ))}
       </nav>
       <div>
-        <button onClick={() => setTabIdx(3)} className="flex items-center">
+        <button onClick={() => setTabIdx(2)} className="flex items-center">
           <ShoppingBagIcon className="h-6 w-6" />
           {cartItemCount ? (
             <span

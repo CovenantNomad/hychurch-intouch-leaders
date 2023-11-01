@@ -7,7 +7,7 @@ import CellDayCartScreen from '../CellDayCartScreen'
 import { getDallentSetting } from '@/firebase/dallant/dallant'
 import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
-import CellDayNoticeScreen from '../CellDayNoticeScreen'
+// import CellDayNoticeScreen from '../CellDayNoticeScreen'
 
 interface CellDayScreenProps {}
 
@@ -35,11 +35,6 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
     },
     {
       id: 2,
-      name: '공지사항',
-      component: <CellDayNoticeScreen />,
-    },
-    {
-      id: 3,
       name: '장바구니',
       component: <CellDayCartScreen setTabIdx={setTabIdx} />,
     },
