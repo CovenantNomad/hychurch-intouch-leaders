@@ -40,6 +40,24 @@ export type Scalars = {
   Float: number
 }
 
+/** 출석체크 */
+export type AttendanceCheck = {
+  __typename?: 'AttendanceCheck'
+  /** 예배 출석일 (yyyy-MM-dd) */
+  attendanceDate: Scalars['String']
+  /** 출석체크 식별자 */
+  id: Scalars['ID']
+  /** 출석체크 상태 */
+  status: AttendanceCheckStatus
+}
+
+export enum AttendanceCheckStatus {
+  /** 출석체크 완료(마감) */
+  Completed = 'COMPLETED',
+  /** 진행중 */
+  InProgress = 'IN_PROGRESS',
+}
+
 export type BetweenFilter = {
   max: Scalars['String']
   min: Scalars['String']
@@ -84,6 +102,18 @@ export type CellAttendance = {
   submitStatus: CellLeaderAttendanceSubmissionStatus
 }
 
+/** 셀 출석체크 제출 현황 데이터. 마감 여부에 따라 셀 또는 셀 스냅샷 정보가 조회됩니다. */
+export type CellAttendanceCheckSubmission = {
+  __typename?: 'CellAttendanceCheckSubmission'
+  /** 공동체 */
+  cellCommunity: Scalars['String']
+  /** 셀 아이디 */
+  cellId: Scalars['ID']
+  /** 셀 이름 */
+  cellName: Scalars['String']
+  submissionStatus: CellLeaderAttendanceSubmissionStatus
+}
+
 export type CellAttendanceCompleted = CellAttendance & {
   __typename?: 'CellAttendanceCompleted'
   submitStatus: CellLeaderAttendanceSubmissionStatus
@@ -123,6 +153,16 @@ export type ChurchService = {
   name: Scalars['String']
   /** 예배 시작 시간 (8:00, 9:30, 11:30, 14:15 등) */
   startAt: Scalars['String']
+}
+
+export type CompleteAttendanceCheckInput = {
+  /** 셀원 예배 출석일자(yyyy-MM-dd). 예) 2022년 5월 29일 예배에 대한 제출이면 2022-05-29 로 입력 */
+  attendanceDate: Scalars['String']
+}
+
+export type CompleteAttendanceCheckPayload = {
+  __typename?: 'CompleteAttendanceCheckPayload'
+  attendanceCheck: AttendanceCheck
 }
 
 export type CreateBarnabaMentorInput = {
@@ -217,6 +257,8 @@ export type LoginPayload = {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  /** 출석체크 마감 */
+  completeAttendanceCheck: CompleteAttendanceCheckPayload
   createBarnabaMentor: CreateBarnabaMentorPayload
   createCell: CreateCellPayload
   /** 셀원 이동 신청 (단건) */
@@ -234,6 +276,10 @@ export type Mutation = {
   /** 사용자 정보를 업데이트 합니다. */
   updateUser: UpdateUserPayload
   updateUserCellTransfer: UpdateUserCellTransferPayload
+}
+
+export type MutationCompleteAttendanceCheckArgs = {
+  input: CompleteAttendanceCheckInput
 }
 
 export type MutationCreateBarnabaMentorArgs = {
@@ -290,6 +336,10 @@ export type MutationUpdateUserCellTransferArgs = {
 
 export type Query = {
   __typename?: 'Query'
+  /** 출석 체크 마감 상태를 조회합니다. */
+  attendanceCheck: AttendanceCheckStatus
+  /** 셀별 출석체크 제출 현황 조회 */
+  cellAttendanceCheckSubmissions: Array<CellAttendanceCheckSubmission>
   /** 셀 단건 조회 */
   findCell: Cell
   /** 셀 전체 조회 */
@@ -299,11 +349,20 @@ export type Query = {
   findUsers: FindUsersPayload
   /** 로그인한 사용자의 정보를 조회합니다. */
   me: User
+  /** 셀 리더의 셀원 출석 체크 제출 정보를 조회합니다. */
   myCellAttendance: CellAttendance
   /** 셀원 조회. 셀장만 셀원 조회가 가능합니다. */
   myCellMembers?: Maybe<Array<User>>
   /** 사용자 정보를 조회합니다. */
   user: User
+}
+
+export type QueryAttendanceCheckArgs = {
+  attendanceDate: Scalars['String']
+}
+
+export type QueryCellAttendanceCheckSubmissionsArgs = {
+  attendanceDate: Scalars['String']
 }
 
 export type QueryFindCellArgs = {
@@ -521,7 +580,8 @@ export type User = {
 
 /** 사용자(인터치 소속 성도, 간사님, 목사님) */
 export type UserUserChurchServiceHistoriesArgs = {
-  baseDate: Scalars['String']
+  maxDate: Scalars['String']
+  minDate: Scalars['String']
 }
 
 /** 셀원의 셀 이동 신청 내역 */
@@ -589,6 +649,15 @@ export type FindChurchServicesQuery = {
     isActive: boolean
     description?: string | null
   }>
+}
+
+export type GetAttendanceCheckQueryVariables = Exact<{
+  attendanceDate: Scalars['String']
+}>
+
+export type GetAttendanceCheckQuery = {
+  __typename?: 'Query'
+  attendanceCheck: AttendanceCheckStatus
 }
 
 export type FindmyCellAttendanceQueryVariables = Exact<{
@@ -1008,6 +1077,34 @@ useFindChurchServicesQuery.getKey = (
   variables === undefined
     ? ['findChurchServices']
     : ['findChurchServices', variables]
+export const GetAttendanceCheckDocument = `
+    query getAttendanceCheck($attendanceDate: String!) {
+  attendanceCheck(attendanceDate: $attendanceDate)
+}
+    `
+export const useGetAttendanceCheckQuery = <
+  TData = GetAttendanceCheckQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetAttendanceCheckQueryVariables,
+  options?: UseQueryOptions<GetAttendanceCheckQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetAttendanceCheckQuery, TError, TData>(
+    ['getAttendanceCheck', variables],
+    fetcher<GetAttendanceCheckQuery, GetAttendanceCheckQueryVariables>(
+      client,
+      GetAttendanceCheckDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+
+useGetAttendanceCheckQuery.getKey = (
+  variables: GetAttendanceCheckQueryVariables
+) => ['getAttendanceCheck', variables]
 export const FindmyCellAttendanceDocument = `
     query findmyCellAttendance($attendanceDate: String!) {
   myCellAttendance(attendanceDate: $attendanceDate) {

@@ -1,0 +1,3 @@
+query getAttendanceCheck($attendanceDate: String!) {
+  attendanceCheck(attendanceDate: $attendanceDate)
+}
