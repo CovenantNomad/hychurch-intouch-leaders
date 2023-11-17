@@ -3,10 +3,12 @@ import { useRecoilValue } from 'recoil'
 import { stateUserInfo } from '@/stores/stateUserInfo'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import {
+  AttendanceCheckStatus,
   CreateUserCellTransferMutation,
   CreateUserCellTransferMutationVariables,
   FindUserCellTransferRegisterQuery,
   FindUserCellTransferRegisterQueryVariables,
+  GetAttendanceCheckQuery,
   RoleType,
   useCreateUserCellTransferMutation,
   useFindUserCellTransferRegisterQuery,
@@ -25,9 +27,17 @@ import dayjs from 'dayjs'
 import { FIND_CELLS_LIMIT } from '@/constants/constants'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
 
-interface CellTransferRegisterProps {}
+type CellTransferRegisterProps = {
+  isAttendanceLoading: boolean
+  isAttendanceFetching: boolean
+  attendanceStatus: GetAttendanceCheckQuery | undefined
+}
 
-const CellTransferRegister = ({}: CellTransferRegisterProps) => {
+const CellTransferRegister = ({
+  isAttendanceLoading,
+  isAttendanceFetching,
+  attendanceStatus,
+}: CellTransferRegisterProps) => {
   const now = dayjs()
   const queryClient = useQueryClient()
   const userInfo = useRecoilValue(stateUserInfo)
@@ -174,39 +184,63 @@ const CellTransferRegister = ({}: CellTransferRegisterProps) => {
 
   return (
     <div className="relative">
-      {isLoading ? (
+      {isLoading || isAttendanceLoading || isAttendanceFetching ? (
         <div className="flex justify-center items-center py-20 lg:py-32">
           <Spinner />
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-y-12 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-0">
-          <div className="flex flex-col gap-y-6 lg:gap-y-8">
-            <ComboBoxImage
-              label="셀원선택"
-              selected={selectedPerson}
-              setSelected={setSelectedPerson}
-              selectList={memberList}
-            />
-            <ComboBoxImage
-              label="셀선택"
-              selected={selectedCell}
-              setSelected={setSelectedCell}
-              selectList={cellList}
-            />
-          </div>
-          <div>
-            <Summary
-              header="Transfer Summary"
-              label="Transfer"
-              onClick={() => setModalOpen(true)}
-            >
-              <Summary.Row
-                title="이동 할 셀원"
-                definition={selectedPerson.name}
-              />
-              <Summary.Row title="이동 할 셀" definition={selectedCell.name} />
-            </Summary>
-          </div>
+          {attendanceStatus &&
+          attendanceStatus.attendanceCheck ===
+            AttendanceCheckStatus.Completed ? (
+            <>
+              <div className="flex flex-col gap-y-6 lg:gap-y-8">
+                <ComboBoxImage
+                  label="셀원선택"
+                  selected={selectedPerson}
+                  setSelected={setSelectedPerson}
+                  selectList={memberList}
+                />
+                <ComboBoxImage
+                  label="셀선택"
+                  selected={selectedCell}
+                  setSelected={setSelectedCell}
+                  selectList={cellList}
+                />
+              </div>
+              <div>
+                <Summary
+                  header="Transfer Summary"
+                  label="Transfer"
+                  onClick={() => setModalOpen(true)}
+                >
+                  <Summary.Row
+                    title="이동 할 셀원"
+                    definition={selectedPerson.name}
+                  />
+                  <Summary.Row
+                    title="이동 할 셀"
+                    definition={selectedCell.name}
+                  />
+                </Summary>
+              </div>
+            </>
+          ) : (
+            <div className="col-span-12 px-6 py-12 sm:px-6 sm:py-24 lg:px-16 lg:mx-auto">
+              <div className="mx-auto max-w-2xl text-center">
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                  다른 리더들이
+                  <br />
+                  출석체크 중에 있습니다.
+                </h2>
+                <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
+                  모든 리더들이 출석체크를 제출하면
+                  <br />
+                  셀원에 대한 이동을 신청할 수 있습니다
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
       <SimpleModal

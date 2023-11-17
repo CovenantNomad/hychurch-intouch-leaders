@@ -6,21 +6,60 @@ import CellTransferAccept from '@/components/Organisms/Cell/CellTransferAccept'
 import CellTransferHistory from '@/components/Organisms/Cell/CellTransferHistory'
 import CellTransferRegister from '@/components/Organisms/Cell/CellTransferRegister'
 import { cellTransferTabs } from '@/constants/menu'
+import { getMostRecentSunday } from '@/utils/dateUtils'
+import {
+  GetAttendanceCheckQuery,
+  GetAttendanceCheckQueryVariables,
+  useGetAttendanceCheckQuery,
+} from '@/graphql/generated'
+import graphlqlRequestClient from '@/client/graphqlRequestClient'
 
 interface CellTransferScreenProps {}
 
 const CellTransferScreen = ({}: CellTransferScreenProps) => {
   const [tabIdx, setTabIdx] = useState<number>(0)
+  const recentSunday = getMostRecentSunday()
+
+  const {
+    isLoading: isAttendanceLoading,
+    isFetching: isAttendanceFetching,
+    data: attendanceStatus,
+  } = useGetAttendanceCheckQuery<
+    GetAttendanceCheckQuery,
+    GetAttendanceCheckQueryVariables
+  >(
+    graphlqlRequestClient,
+    {
+      attendanceDate: recentSunday.format('YYYY-MM-DD'),
+    },
+    {
+      staleTime: 15 * 60 * 1000,
+      cacheTime: 30 * 60 * 1000,
+    }
+  )
+
   const categories = [
     {
       id: 0,
       name: '이동신청',
-      component: <CellTransferRegister />,
+      component: (
+        <CellTransferRegister
+          isAttendanceLoading={isAttendanceLoading}
+          isAttendanceFetching={isAttendanceFetching}
+          attendanceStatus={attendanceStatus}
+        />
+      ),
     },
     {
       id: 1,
       name: '이동승인',
-      component: <CellTransferAccept />,
+      component: (
+        <CellTransferAccept
+          isAttendanceLoading={isAttendanceLoading}
+          isAttendanceFetching={isAttendanceFetching}
+          attendanceStatus={attendanceStatus}
+        />
+      ),
     },
     {
       id: 2,
