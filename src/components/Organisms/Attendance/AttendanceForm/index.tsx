@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import {
   FindChurchServicesQuery,
@@ -8,17 +8,16 @@ import {
   useFindChurchServicesQuery,
   useFindMyCellMembersQuery,
 } from '@/graphql/generated'
+import { toast } from 'react-hot-toast'
+// components
 import { Disclosure, Switch } from '@headlessui/react'
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai'
-import { classNames } from '@/utils/utils'
-import { useRecoilState } from 'recoil'
-import { attendanceState } from '@/stores/attendaceState'
-import { AttendanceGlobalState, AttendanceStatus } from '@/types/attendance'
 import Spinner from '@/components/Atoms/Spinner'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
 import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
-import useAttendance from '@/hooks/useAttendance'
-import { toast } from 'react-hot-toast'
+// utils
+import { classNames } from '@/utils/utils'
+import { AttendanceGlobalState } from '@/types/attendance'
 
 interface onCheckHandlerPrps {
   checked: boolean
@@ -110,7 +109,8 @@ const AttendanceForm = ({
                     <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
                       <div className="flex items-center">
                         <span className="font-medium text-gray-900">
-                          {service.name}
+                          {service.name} ({service.startAt.split(':')[0]}:
+                          {service.startAt.split(':')[1]})
                         </span>
                         {attendance.tempAttendanceList !== null &&
                           attendance.tempAttendanceList.filter(
@@ -145,6 +145,7 @@ const AttendanceForm = ({
                         >
                           <div className="flex items-center">
                             <input
+                              id={`${service.id}-${member.id}`}
                               type="checkbox"
                               onChange={(e) =>
                                 onCheckHandler({
@@ -168,7 +169,10 @@ const AttendanceForm = ({
                               value={member.id}
                               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                             />
-                            <label className="ml-3 min-w-0 flex-1 text-gray-500">
+                            <label
+                              htmlFor={`${service.id}-${member.id}`}
+                              className="ml-3 min-w-0 flex-1 text-gray-500"
+                            >
                               {member.name}
                             </label>
                           </div>

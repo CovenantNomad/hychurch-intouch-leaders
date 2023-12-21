@@ -14,7 +14,6 @@ import {
   useFindUserCellTransferRegisterQuery,
   UserCellTransferStatus,
 } from '@/graphql/generated'
-import Spacer from '@/components/Atoms/Spacer'
 import ComboBoxImage from '@/components/Blocks/Combobox/ComboBoxImage'
 import Summary from '@/components/Blocks/Summary/Summary'
 import Spinner from '@/components/Atoms/Spinner'
@@ -154,7 +153,8 @@ const CellTransferRegister = ({
           (cell) =>
             cell.id !== userInfo?.cell?.id &&
             !cell.id.includes(SpecialCellIdType.NewFamily) &&
-            !cell.id.includes(SpecialCellIdType.Blessing)
+            !cell.id.includes(SpecialCellIdType.Blessing) &&
+            !cell.id.includes(SpecialCellIdType.Renew)
         )
         .map((cell) => {
           return {
@@ -179,6 +179,14 @@ const CellTransferRegister = ({
         input: submitData,
       })
       setModalOpen(false)
+    } else {
+      if (selectedPerson.id !== '') {
+        toast.error('이동할 셀원을 선택해주세요')
+      }
+
+      if (!userInfo?.cell?.id && selectedCell.id !== '') {
+        toast.error('이동할 셀을 선택해주세요')
+      }
     }
   }, [selectedCell, selectedPerson, userInfo, mutate])
 
@@ -207,12 +215,38 @@ const CellTransferRegister = ({
                   setSelected={setSelectedCell}
                   selectList={cellList}
                 />
+                <div className="flex justify-end -mt-2 lg:-mt-0">
+                  <button
+                    onClick={() => {
+                      setSelectedCell({
+                        id: SpecialCellIdType.Renew,
+                        name: '새싹셀',
+                      })
+                    }}
+                    className={`max-w-[136px] rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-poppins font-medium text-white shadow-sm focus:outline-none disabled:bg-stone-300`}
+                  >
+                    새싹셀로 편성하기
+                  </button>
+                </div>
               </div>
               <div>
                 <Summary
                   header="Transfer Summary"
-                  label="Transfer"
-                  onClick={() => setModalOpen(true)}
+                  isSecondaryButton
+                  primaryLabel="Transfer"
+                  secondaryLabel="Cancel"
+                  disabled={selectedPerson.id === '' || selectedCell.id === ''}
+                  onSecondaryClick={() => {
+                    setSelectedPerson({
+                      id: '',
+                      name: '',
+                    })
+                    setSelectedCell({
+                      id: '',
+                      name: '',
+                    })
+                  }}
+                  onPrimaryClick={() => setModalOpen(true)}
                 >
                   <Summary.Row
                     title="이동 할 셀원"

@@ -1,8 +1,10 @@
 import React from 'react'
 
-interface SpinnerProps {}
+interface SpinnerProps {
+  text?: string
+}
 
-const Spinner = ({}: SpinnerProps) => {
+const Spinner = ({ text = 'Loading...' }: SpinnerProps) => {
   return (
     <div className="flex items-center">
       <svg
@@ -20,7 +22,7 @@ const Spinner = ({}: SpinnerProps) => {
           fill="currentFill"
         />
       </svg>
-      <span className="text-base">Loading...</span>
+      <span className="text-base">{text}</span>
     </div>
   )
 }

@@ -3,12 +3,14 @@ query findMyCellMember($id: ID!) {
     id
     name
     phone
+    grade
     isActive
     birthday
     gender
     address
     description
     roles
+    registrationDate
     cell {
       id
       name

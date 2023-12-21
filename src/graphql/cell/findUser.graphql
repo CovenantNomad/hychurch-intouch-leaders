@@ -3,6 +3,7 @@ query findUser($id: ID!) {
     id
     name
     phone
+    grade
     isActive
     birthday
     gender

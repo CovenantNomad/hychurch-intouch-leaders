@@ -1,31 +1,33 @@
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
-import { Gender, useUpdateUserMutation } from '@/graphql/generated'
+import { Gender, UserGrade, useUpdateUserMutation } from '@/graphql/generated'
 import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { GraphQLError } from 'graphql'
+import { Dispatch, SetStateAction } from 'react'
 import { useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
+import Spinner from '@/components/Atoms/Spinner'
 
 export interface UpdateUserInfomationProps {
   id: string
   name: string
+  grade: UserGrade
   isActive: boolean
   birthday?: string | null | undefined
   gender?: Gender | null | undefined
   address?: string | null | undefined
   phone: string
   description: string | null | undefined
-  cell:
-    | {
-        id: string
-        name: string
-      }
-    | null
-    | undefined
+  registrationYear?: string
+  registrationMonth?: string
+  registrationDay?: string
+  editModeHandler: Dispatch<SetStateAction<boolean>>
 }
 
 export interface EditForm {
   name: string
   gender: Gender
+  grade: UserGrade
   isActive: string
   year?: string
   month?: string
@@ -33,40 +35,45 @@ export interface EditForm {
   phone: string
   address?: string
   description?: string
+  newRegistrationYear?: string
+  newRegistrationMonth?: string
+  newRegistrationDay?: string
+  editModeHandler: Dispatch<SetStateAction<boolean>>
 }
 
 const UserInfomationForm = ({
   id,
   name,
   gender,
+  grade,
   isActive,
   birthday,
   phone,
   address,
   description,
-  cell,
+  registrationYear,
+  registrationMonth,
+  registrationDay,
+  editModeHandler,
 }: UpdateUserInfomationProps) => {
+  const today = dayjs()
   const queryClient = useQueryClient()
   const {
     handleSubmit,
     register,
     formState: { errors },
-    reset,
   } = useForm<EditForm>()
-  const { mutate, isLoading, isError, isSuccess } = useUpdateUserMutation(
-    graphlqlRequestClient,
-    {
-      onSuccess: (data) => {
-        toast.success('정보가 수정되었습니다')
-        queryClient.invalidateQueries({
-          queryKey: ['findMyCellMember', { id: id }],
-        })
-      },
-      onError: (errors: GraphQLError) => {
-        toast.error(`해당 청년 정보를 수정 중 오류가 발생하였습니다.`)
-      },
-    }
-  )
+  const { mutate, isLoading } = useUpdateUserMutation(graphlqlRequestClient, {
+    onSuccess: (data) => {
+      toast.success('정보가 수정되었습니다')
+      queryClient.invalidateQueries({
+        queryKey: ['findMyCellMember', { id: id }],
+      })
+    },
+    onError: (errors: GraphQLError) => {
+      toast.error(`해당 청년 정보를 수정 중 오류가 발생하였습니다.`)
+    },
+  })
 
   const onSubmitHandler = ({
     name,
@@ -77,20 +84,27 @@ const UserInfomationForm = ({
     phone,
     address,
     description,
+    grade,
     isActive,
+    newRegistrationYear,
+    newRegistrationMonth,
+    newRegistrationDay,
   }: EditForm) => {
     const birthday = `${year}-${month}-${day}`
-    const isActiveStatus = isActive === '활동' ? true : false
+    const registrationDate = `${newRegistrationYear}-${newRegistrationMonth}-${newRegistrationDay}`
+    const isActiveStatus = isActive === '포함' ? true : false
     mutate({
       input: {
         id,
         name,
         gender,
+        grade,
         isActive: isActiveStatus,
         phone,
         birthday,
         address,
         description,
+        registrationDate,
       },
     })
   }
@@ -100,12 +114,12 @@ const UserInfomationForm = ({
       <form onSubmit={handleSubmit(onSubmitHandler)}>
         <div className="py-5 bg-white sm:py-6">
           <div className="grid grid-cols-6 gap-6">
-            <div className="col-span-6">
+            <div className="col-span-6 sm:col-span-3">
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
-                이름
+                이름*
               </label>
               <input
                 type="text"
@@ -142,7 +156,7 @@ const UserInfomationForm = ({
                 htmlFor="gender"
                 className="block text-sm font-medium text-gray-700"
               >
-                성별
+                성별*
               </label>
               <select
                 id="gender"
@@ -162,19 +176,43 @@ const UserInfomationForm = ({
 
             <div className="col-span-6 sm:col-span-3">
               <label
+                htmlFor="grade"
+                className="block text-sm font-medium text-gray-700"
+              >
+                활동등급*
+              </label>
+              <select
+                id="grade"
+                defaultValue={grade}
+                {...register('grade')}
+                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-navy-blue sm:text-sm"
+              >
+                <option value={'A'}>A</option>
+                <option value={'B'}>B</option>
+                <option value={'C'}>C</option>
+              </select>
+              {errors.grade && (
+                <p className="mt-1 px-3 text-sm text-red-600">
+                  {errors.grade.message}
+                </p>
+              )}
+            </div>
+
+            <div className="col-span-6 sm:col-span-3">
+              <label
                 htmlFor="isActive"
                 className="block text-sm font-medium text-gray-700"
               >
-                활동여부
+                셀보고서 포함여부*
               </label>
               <select
                 id="isActive"
-                defaultValue={isActive ? '활동' : '미활동'}
+                defaultValue={isActive ? '포함' : '미포함'}
                 {...register('isActive')}
                 className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-navy-blue sm:text-sm"
               >
-                <option value={'활동'}>활동</option>
-                <option value={'미활동'}>미활동</option>
+                <option value={'포함'}>포함</option>
+                <option value={'미포함'}>미포함</option>
               </select>
               {errors.gender && (
                 <p className="mt-1 px-3 text-sm text-red-600">
@@ -210,7 +248,7 @@ const UserInfomationForm = ({
                   })}
                   className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
                 />
-                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                <span className="absolute top-1/2 right-0 lg:right-6 -mt-2 text-gray-500 text-sm">
                   년
                 </span>
               </div>
@@ -243,7 +281,7 @@ const UserInfomationForm = ({
                   })}
                   className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
                 />
-                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                <span className="absolute top-1/2 right-0 lg:right-6 -mt-2 text-gray-500 text-sm">
                   월
                 </span>
               </div>
@@ -276,7 +314,7 @@ const UserInfomationForm = ({
                   })}
                   className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
                 />
-                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                <span className="absolute top-1/2 right-0 lg:right-6 -mt-2 text-gray-500 text-sm">
                   일
                 </span>
               </div>
@@ -334,6 +372,134 @@ const UserInfomationForm = ({
                 className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none focus:border-navy-blue sm:text-sm"
               />
             </div>
+
+            <div className="col-span-6 -mb-6">
+              <span className="block text-sm font-medium text-gray-700">
+                등록일*
+              </span>
+            </div>
+
+            <div className="col-span-2">
+              <div className="relative flex items-center w-full">
+                <label htmlFor="year" className="sr-only">
+                  년
+                </label>
+                <input
+                  id="year"
+                  type="text"
+                  placeholder="YYYY"
+                  defaultValue={registrationYear ? registrationYear : '2022'}
+                  {...register('newRegistrationYear', {
+                    minLength: {
+                      value: 4,
+                      message: '4자리로 입력해주세요 (YYYY)',
+                    },
+                    maxLength: {
+                      value: 4,
+                      message: '4자리로 입력해주세요 (YYYY)',
+                    },
+                    max: {
+                      value: today.get('year'),
+                      message: `${today.get('year')}년을 넘을 수 없습니다`,
+                    },
+                  })}
+                  className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
+                />
+                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                  년
+                </span>
+              </div>
+              {errors.newRegistrationYear && (
+                <p className="mt-1 px-3 text-sm text-red-600">
+                  {errors.newRegistrationYear.message}
+                </p>
+              )}
+            </div>
+
+            <div className="col-span-2">
+              <div className="relative flex items-center w-full">
+                <label htmlFor="month" className="sr-only">
+                  월
+                </label>
+                <input
+                  id="month"
+                  type="text"
+                  placeholder="MM"
+                  defaultValue={registrationMonth ? registrationMonth : '12'}
+                  {...register('newRegistrationMonth', {
+                    setValueAs: (v: string) => v.padStart(2, '0'),
+                    minLength: {
+                      value: 2,
+                      message: '2자리로 입력해주세요 (MM)',
+                    },
+                    maxLength: {
+                      value: 2,
+                      message: '4자리로 입력해주세요 (MM)',
+                    },
+                    min: {
+                      value: 1,
+                      message: '1월보다 작을 수 없습니다',
+                    },
+                    max: {
+                      value: 12,
+                      message: '12월을 넘을 수 없습니다',
+                    },
+                  })}
+                  className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
+                />
+                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                  월
+                </span>
+              </div>
+              {errors.newRegistrationMonth && (
+                <p className="mt-1 px-3 text-sm text-red-600">
+                  {errors.newRegistrationMonth.message}
+                </p>
+              )}
+            </div>
+
+            <div className="col-span-2">
+              <div className="relative flex items-center w-full">
+                <label htmlFor="day" className="sr-only">
+                  일
+                </label>
+                <input
+                  id="day"
+                  type="text"
+                  placeholder="DD"
+                  defaultValue={registrationDay ? registrationDay : '31'}
+                  {...register('newRegistrationDay', {
+                    setValueAs: (v: string) => v.padStart(2, '0'),
+                    minLength: {
+                      value: 2,
+                      message: '2자리로 입력해주세요 (DD)',
+                    },
+                    maxLength: {
+                      value: 2,
+                      message: '4자리로 입력해주세요 (DD)',
+                    },
+                    min: {
+                      value: 1,
+                      message: '1일보다 작을 수 없습니다',
+                    },
+                    max: {
+                      value: 31,
+                      message: '31일을 넘을 수 없습니다',
+                    },
+                  })}
+                  className="mt-1 block w-[80%] py-2 px-3 border border-gray-300 rounded-md shadow-sm outline-none appearance-none text-right focus:border-navy-blue sm:w-[90%] sm:text-sm"
+                />
+                <span className="absolute top-1/2 right-0 -mt-2 text-gray-500 text-sm">
+                  일
+                </span>
+              </div>
+              {errors.newRegistrationDay && (
+                <p className="mt-1 px-3 text-sm text-red-600">
+                  {errors.newRegistrationDay.message}
+                </p>
+              )}
+            </div>
+
             <div className="col-span-6">
               <label
                 htmlFor="description"
@@ -354,12 +520,20 @@ const UserInfomationForm = ({
             </div>
           </div>
         </div>
-        <div className="py-3 bg-white text-right">
+        <div className="py-3 space-x-4 bg-white text-right">
+          <button
+            type="button"
+            onClick={() => editModeHandler(false)}
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+          >
+            취소
+          </button>
           <button
             type="submit"
+            disabled={isLoading}
             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
-            수정하기
+            {isLoading ? <Spinner text="제출중..." /> : '수정하기'}
           </button>
         </div>
       </form>
