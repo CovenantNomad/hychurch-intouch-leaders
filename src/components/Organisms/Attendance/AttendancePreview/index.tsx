@@ -5,8 +5,7 @@ import React, {
   useState,
   Fragment,
 } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { attendanceState } from '@/stores/attendaceState'
+import { useRecoilValue } from 'recoil'
 import { stateUserInfo } from '@/stores/stateUserInfo'
 import { getServiceName, groupByChurchService } from '@/utils/utils'
 import SimpleModal from '@/components/Atoms/Modals/SimpleModal'
@@ -14,16 +13,9 @@ import {
   AttendanceGlobalState,
   TempSavedAttendanceHistory,
 } from '@/types/attendance'
-import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import { toast } from 'react-hot-toast'
-import {
-  CellLeaderAttendanceSubmissionStatus,
-  SubmitAttendanceMutation,
-  SubmitAttendanceMutationVariables,
-  useSubmitAttendanceMutation,
-} from '@/graphql/generated'
+import { SubmitAttendanceMutation } from '@/graphql/generated'
 import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
-import useAttendance from '@/hooks/useAttendance'
 
 interface AttendancePreviewProps {
   attendance: AttendanceGlobalState

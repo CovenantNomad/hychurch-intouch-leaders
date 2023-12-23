@@ -155,6 +155,15 @@ export type ChurchService = {
   startAt: Scalars['String']
 }
 
+export type ChurchServiceAttendanceStat = {
+  __typename?: 'ChurchServiceAttendanceStat'
+  /** 예배 출석 일자 */
+  attendanceDate: Scalars['String']
+  churchService: ChurchService
+  isOnline: Scalars['Boolean']
+  totalCount: Scalars['Int']
+}
+
 export type CompleteAttendanceCheckInput = {
   /** 셀원 예배 출석일자(yyyy-MM-dd). 예) 2022년 5월 29일 예배에 대한 제출이면 2022-05-29 로 입력 */
   attendanceDate: Scalars['String']
@@ -242,6 +251,16 @@ export enum Gender {
   Woman = 'WOMAN',
 }
 
+export type IntouchManualAttendance = {
+  __typename?: 'IntouchManualAttendance'
+  /** 예배 출석 일자 */
+  attendanceDate: Scalars['String']
+  /** 인터치 예배 출석 인원 (성전 예배 수기 측정값) */
+  count: Scalars['Int']
+  /** 유일 식별자 */
+  id: Scalars['ID']
+}
+
 export type LoginInput = {
   /** 로그인 비밀번호 */
   password: Scalars['String']
@@ -269,6 +288,8 @@ export type Mutation = {
   registerNewUser: RegisterNewUserPayload
   removeUserFromSeedlingCell: RemoveUserFromSeedlingCellPayload
   resetUserPassword: ResetUserPasswordPayload
+  /** 인터치 성전예배 출석인원 수기측정 값을 저장합니다. (해당 일자에 이미 저장된 값이 있으면 수정합니다) */
+  saveIntouchManualAttendance: SaveIntouchManualAttendancePayload
   signUp: SignUpPayload
   /** 셀장이 셀원들의 예배 출석 이력 다건을 기록합니다. */
   submitCellMemberChurchServiceAttendanceHistories: SubmitCellMemberChurchServiceAttendanceHistoriesPayload
@@ -314,6 +335,10 @@ export type MutationResetUserPasswordArgs = {
   input: ResetUserPasswordInput
 }
 
+export type MutationSaveIntouchManualAttendanceArgs = {
+  input: SaveIntouchManualAttendanceInput
+}
+
 export type MutationSignUpArgs = {
   input: SignUpInput
 }
@@ -340,6 +365,7 @@ export type Query = {
   attendanceCheck: AttendanceCheckStatus
   /** 셀별 출석체크 제출 현황 조회 */
   cellAttendanceCheckSubmissions: Array<CellAttendanceCheckSubmission>
+  churchServiceAttendanceStats: Array<ChurchServiceAttendanceStat>
   /** 셀 단건 조회 */
   findCell: Cell
   /** 셀 전체 조회 */
@@ -347,6 +373,7 @@ export type Query = {
   findChurchServices: Array<ChurchService>
   /** 전체 사용자 조회 */
   findUsers: FindUsersPayload
+  intouchManualAttendance: Array<IntouchManualAttendance>
   /** 로그인한 사용자의 정보를 조회합니다. */
   me: User
   /** 셀 리더의 셀원 출석 체크 제출 정보를 조회합니다. */
@@ -365,6 +392,10 @@ export type QueryCellAttendanceCheckSubmissionsArgs = {
   attendanceDate: Scalars['String']
 }
 
+export type QueryChurchServiceAttendanceStatsArgs = {
+  attendanceDate: Scalars['String']
+}
+
 export type QueryFindCellArgs = {
   id: Scalars['Float']
 }
@@ -378,6 +409,11 @@ export type QueryFindUsersArgs = {
   limit?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
   offset?: InputMaybe<Scalars['Int']>
+}
+
+export type QueryIntouchManualAttendanceArgs = {
+  maxDate: Scalars['String']
+  minDate: Scalars['String']
 }
 
 export type QueryMyCellAttendanceArgs = {
@@ -440,6 +476,18 @@ export enum RoleType {
   Operator = 'OPERATOR',
   /** 부 리더 */
   ViceLeader = 'VICE_LEADER',
+}
+
+export type SaveIntouchManualAttendanceInput = {
+  /** 예배 출석 일자 */
+  attendanceDate: Scalars['String']
+  /** 인터치 예배 출석 인원 (성전 예배 수기 측정값) */
+  count: Scalars['Int']
+}
+
+export type SaveIntouchManualAttendancePayload = {
+  __typename?: 'SaveIntouchManualAttendancePayload'
+  intouchManualAttendance: IntouchManualAttendance
 }
 
 export type SignUpInput = {
@@ -533,6 +581,8 @@ export type UpdateUserInput = {
   description?: InputMaybe<Scalars['String']>
   /** 성별 */
   gender: Gender
+  /** 사용자 등급 */
+  grade: UserGrade
   /** 아이디 */
   id: Scalars['ID']
   /** 자주 출석하는 지 여부 */
@@ -563,6 +613,8 @@ export type User = {
   description?: Maybe<Scalars['String']>
   /** 성별 */
   gender?: Maybe<Gender>
+  /** 사용자 등급 */
+  grade: UserGrade
   /** 아이디 */
   id: Scalars['ID']
   /** 자주 출석하는 지 여부 */
@@ -635,6 +687,21 @@ export type UserChurchServiceHistoryInput = {
   userId: Scalars['ID']
   /** 사용자(셀원) 이름 */
   userName: Scalars['String']
+}
+
+export enum UserGrade {
+  /** 예배출석, 셀모임 모두 잘 하시는 분들 */
+  A = 'A',
+  /** 예배출석, 셀모임 중 하나만 꾸준하거나 하는 분들(명확한 기준은 없음…) */
+  B = 'B',
+  /** 셀 배정은 되었으나 활동을 잘 안하는.. (거의 안나옴) */
+  C = 'C',
+  /** 예배출석만 하는 새싹셀 인원 */
+  D = 'D',
+  /** 예배출석이 많이 뜸해진 새싹셀 인원 */
+  E = 'E',
+  /** 정말 더 이상 안오시는 분들 (영커플로 부서 이동, 이사, 이직 등) */
+  F = 'F',
 }
 
 export type FindChurchServicesQueryVariables = Exact<{ [key: string]: never }>
@@ -796,12 +863,14 @@ export type FindMyCellMemberQuery = {
     id: string
     name: string
     phone: string
+    grade: UserGrade
     isActive: boolean
     birthday?: string | null
     gender?: Gender | null
     address?: string | null
     description?: string | null
     roles: Array<RoleType>
+    registrationDate?: string | null
     cell?: { __typename?: 'Cell'; id: string; name: string } | null
   }
 }
@@ -836,6 +905,7 @@ export type FindUserQuery = {
     id: string
     name: string
     phone: string
+    grade: UserGrade
     isActive: boolean
     birthday?: string | null
     gender?: Gender | null
@@ -1006,12 +1076,14 @@ export type UpdateUserMutation = {
       id: string
       name: string
       phone: string
+      grade: UserGrade
       isActive: boolean
       birthday?: string | null
       gender?: Gender | null
       address?: string | null
       roles: Array<RoleType>
       description?: string | null
+      registrationDate?: string | null
       cell?: { __typename?: 'Cell'; id: string; name: string } | null
     }
   }
@@ -1355,12 +1427,14 @@ export const FindMyCellMemberDocument = `
     id
     name
     phone
+    grade
     isActive
     birthday
     gender
     address
     description
     roles
+    registrationDate
     cell {
       id
       name
@@ -1444,6 +1518,7 @@ export const FindUserDocument = `
     id
     name
     phone
+    grade
     isActive
     birthday
     gender
@@ -1694,6 +1769,7 @@ export const UpdateUserDocument = `
       id
       name
       phone
+      grade
       isActive
       birthday
       gender
@@ -1704,6 +1780,7 @@ export const UpdateUserDocument = `
       }
       roles
       description
+      registrationDate
     }
   }
 }

@@ -48,23 +48,38 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
         </div>
       ) : (
         <div>
-          {data && data.isCellDayOpen ? (
+          {data && data.isActivity ? (
             <>
-              <CellDayHeader tabIdx={tabIdx} setTabIdx={setTabIdx} />
-              <div>{subCategories[tabIdx].component}</div>
+              {data && data.isCellDayOpen ? (
+                <>
+                  <CellDayHeader tabIdx={tabIdx} setTabIdx={setTabIdx} />
+                  <div>{subCategories[tabIdx].component}</div>
+                </>
+              ) : (
+                <Container>
+                  <div className="flex flex-col justify-center items-center py-12">
+                    <Image
+                      src={'/images/close.png'}
+                      width={163}
+                      height={141}
+                      alt="영업종료"
+                    />
+                    <p className="mt-2 text-lg font-semibold text-center whitespace-pre-line">{`영업종료\n더 이상 주문을 받지 않습니다`}</p>
+                  </div>
+                </Container>
+              )}
             </>
           ) : (
-            <Container>
-              <div className="flex flex-col justify-center items-center py-12">
-                <Image
-                  src={'/images/close.png'}
-                  width={163}
-                  height={141}
-                  alt="영업종료"
-                />
-                <p className="mt-2 text-lg font-semibold text-center whitespace-pre-line">{`영업종료\n더 이상 주문을 받지 않습니다`}</p>
-              </div>
-            </Container>
+            <div className="text-center pt-16 pb-8 lg:pt-20 lg:pb-8">
+              <h1 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                시즌아웃
+              </h1>
+              <p className="mt-6 text-sm leading-7 text-gray-600">
+                지금은 달란트를 모으는 시기가 아닙니다.
+                <br />
+                다음에 만나요 👋🏻
+              </p>
+            </div>
           )}
         </div>
       )}

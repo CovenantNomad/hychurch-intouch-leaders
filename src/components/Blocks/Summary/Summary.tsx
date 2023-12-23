@@ -8,18 +8,43 @@ type CompoundComposition = {
 }
 
 const Summary: React.FC<{
-  children: React.ReactNode
-  label: string
   header: string
-  onClick: () => void
+  children: React.ReactNode
+  primaryLabel: string
+  isSecondaryButton?: boolean
+  secondaryLabel?: string
+  disabled?: boolean
+  onPrimaryClick: () => void
+  onSecondaryClick?: () => void
 }> &
   CompoundComposition = (props) => {
   return (
     <section className="rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:p-8">
       <SummaryHeader header={props.header} />
       <dl className="mt-6 space-y-4">{props.children}</dl>
-      <div className="mt-8">
-        <SummaryButton label={props.label} onClick={props.onClick} />
+      <div
+        className={`${
+          props.isSecondaryButton && 'grid grid-cols-3 gap-x-6'
+        } mt-8`}
+      >
+        {props.isSecondaryButton &&
+          props.secondaryLabel &&
+          props.onSecondaryClick && (
+            <div className="col-span-1">
+              <SummaryButton
+                label={props.secondaryLabel}
+                onClick={props.onSecondaryClick}
+                isSecondaryButton
+              />
+            </div>
+          )}
+        <div className={`${props.isSecondaryButton && 'col-span-2'}`}>
+          <SummaryButton
+            label={props.primaryLabel}
+            disabled={props.disabled}
+            onClick={props.onPrimaryClick}
+          />
+        </div>
       </div>
     </section>
   )

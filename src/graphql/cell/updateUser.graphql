@@ -4,6 +4,7 @@ mutation updateUser($input: UpdateUserInput!) {
       id
       name
       phone
+      grade
       isActive
       birthday
       gender
@@ -14,6 +15,7 @@ mutation updateUser($input: UpdateUserInput!) {
       }
       roles
       description
+      registrationDate
     }
   }
 }
