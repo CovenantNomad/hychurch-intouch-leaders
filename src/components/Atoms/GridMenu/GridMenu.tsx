@@ -9,21 +9,19 @@ interface GridMenuProps {
     title: string
     icon: string
   }[]
+  onSelectHandler: (id: number) => void
 }
 
-const GridMenu = ({ menuList }: GridMenuProps) => {
-  const [setting, setSetting] = useRecoilState(stateSetting)
+const GridMenu = ({ menuList, onSelectHandler }: GridMenuProps) => {
   return (
-    <div className="grid grid-cols-3">
+    <div className="grid grid-cols-4">
       {menuList.map((menu) => (
         <div
           key={menu.id}
           className="inline-block text-center mr-6 cursor-pointer"
-          onClick={() =>
-            setSetting({ ...setting, cellSelectedCategoryId: menu.id })
-          }
+          onClick={() => onSelectHandler(menu.id)}
         >
-          <div className="flex items-center justify-center p-8 rounded-2xl shadow-lg bg-gray-50">
+          <div className="flex items-center justify-center p-4 rounded-2xl shadow-lg bg-gray-50 lg:p-6">
             <p className="text-3xl">{menu.icon}</p>
           </div>
           <Spacer size={'h-2'} />

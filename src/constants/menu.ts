@@ -45,7 +45,7 @@ export const cellMenu = [
   {
     id: 0,
     title: '셀 정보',
-    icon: '🔖',
+    icon: '💌',
   },
   {
     id: 1,
@@ -57,12 +57,22 @@ export const cellMenu = [
     title: '셀원 이동',
     icon: '✈️',
   },
+  {
+    id: 3,
+    title: '셀평가서',
+    icon: '📑',
+  },
 ]
 
 export const cellTransferTabs = [
   { id: 0, title: '이동신청' },
   { id: 1, title: '이동승인' },
   { id: 2, title: '이동결과' },
+]
+
+export const cellEvaluationTabs = [
+  { id: 0, title: '작성하기' },
+  { id: 1, title: '열람하기' },
 ]
 
 export const AttendanceSteps = [
