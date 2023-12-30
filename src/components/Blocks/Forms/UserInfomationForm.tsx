@@ -27,7 +27,6 @@ export interface UpdateUserInfomationProps {
 export interface EditForm {
   name: string
   gender: Gender
-  grade: UserGrade
   isActive: string
   year?: string
   month?: string
@@ -84,7 +83,6 @@ const UserInfomationForm = ({
     phone,
     address,
     description,
-    grade,
     isActive,
     newRegistrationYear,
     newRegistrationMonth,
@@ -98,7 +96,7 @@ const UserInfomationForm = ({
         id,
         name,
         gender,
-        grade,
+        grade: grade,
         isActive: isActiveStatus,
         phone,
         birthday,
