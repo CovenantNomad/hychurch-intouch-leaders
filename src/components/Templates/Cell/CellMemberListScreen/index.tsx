@@ -3,6 +3,7 @@ import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import Spacer from '@/components/Atoms/Spacer'
 import Spinner from '@/components/Atoms/Spinner'
 import SectionTitle from '@/components/Atoms/Typography/SectionTitle'
+import CellLeaderListItem from '@/components/Organisms/Cell/CellLeaderListItem'
 import CellMemberListItem from '@/components/Organisms/Cell/CellMemberListItem'
 import {
   FindMyCellMembersQuery,
@@ -10,11 +11,13 @@ import {
   RoleType,
   useFindMyCellMembersQuery,
 } from '@/graphql/generated'
+import { useAuth } from '@/hooks/useAuth'
 import React from 'react'
 
 interface CellMemberListScreenProps {}
 
 const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
+  const { userInfo } = useAuth()
   const { isLoading, data } = useFindMyCellMembersQuery<
     FindMyCellMembersQuery,
     FindMyCellMembersQueryVariables
@@ -29,6 +32,14 @@ const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
 
   return (
     <>
+      <SectionTitle title="셀리더 정보" />
+      <Spacer size={'h-3'} />
+      {userInfo ? (
+        <CellLeaderListItem userId={userInfo.id} name={userInfo.name} />
+      ) : (
+        <div>리더 정보를 가져올 수 없습니다</div>
+      )}
+      <Spacer size={'h-8'} />
       <SectionTitle title="셀원 정보" />
       <Spacer size={'h-3'} />
       {isLoading ? (
@@ -54,7 +65,7 @@ const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
       ) : (
         <EmptyStateSimple />
       )}
-      <Spacer size={'h-8'} />
+      <Spacer size={'h-[50px]'} />
     </>
   )
 }

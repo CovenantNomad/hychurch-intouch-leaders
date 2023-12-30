@@ -175,27 +175,12 @@ const UserInfomationForm = ({
             </div>
 
             <div className="col-span-6 sm:col-span-3">
-              <label
-                htmlFor="grade"
-                className="block text-sm font-medium text-gray-700"
-              >
-                활동등급*
-              </label>
-              <select
-                id="grade"
-                defaultValue={grade}
-                {...register('grade')}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-navy-blue sm:text-sm"
-              >
-                <option value={'A'}>A</option>
-                <option value={'B'}>B</option>
-                <option value={'C'}>C</option>
-              </select>
-              {errors.grade && (
-                <p className="mt-1 px-3 text-sm text-red-600">
-                  {errors.grade.message}
-                </p>
-              )}
+              <span className="block text-sm font-medium text-gray-700">
+                활동등급 (수정사항 X)
+              </span>
+              <p className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:border-navy-blue sm:text-sm">
+                {grade}
+              </p>
             </div>
 
             <div className="col-span-6 sm:col-span-3">
