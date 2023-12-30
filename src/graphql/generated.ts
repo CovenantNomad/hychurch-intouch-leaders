@@ -718,6 +718,27 @@ export type FindChurchServicesQuery = {
   }>
 }
 
+export type FindIndividualAttendanceQueryVariables = Exact<{
+  id: Scalars['ID']
+  minDate: Scalars['String']
+  maxDate: Scalars['String']
+}>
+
+export type FindIndividualAttendanceQuery = {
+  __typename?: 'Query'
+  user: {
+    __typename?: 'User'
+    id: string
+    name: string
+    userChurchServiceHistories: Array<{
+      __typename?: 'UserChurchServiceHistory'
+      attendedAt: string
+      isOnline: boolean
+      churchService: { __typename?: 'ChurchService'; id: string; name: string }
+    }>
+  }
+}
+
 export type GetAttendanceCheckQueryVariables = Exact<{
   attendanceDate: Scalars['String']
 }>
@@ -1149,6 +1170,43 @@ useFindChurchServicesQuery.getKey = (
   variables === undefined
     ? ['findChurchServices']
     : ['findChurchServices', variables]
+export const FindIndividualAttendanceDocument = `
+    query findIndividualAttendance($id: ID!, $minDate: String!, $maxDate: String!) {
+  user(id: $id) {
+    id
+    name
+    userChurchServiceHistories(minDate: $minDate, maxDate: $maxDate) {
+      attendedAt
+      isOnline
+      churchService {
+        id
+        name
+      }
+    }
+  }
+}
+    `
+export const useFindIndividualAttendanceQuery = <
+  TData = FindIndividualAttendanceQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FindIndividualAttendanceQueryVariables,
+  options?: UseQueryOptions<FindIndividualAttendanceQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FindIndividualAttendanceQuery, TError, TData>(
+    ['findIndividualAttendance', variables],
+    fetcher<
+      FindIndividualAttendanceQuery,
+      FindIndividualAttendanceQueryVariables
+    >(client, FindIndividualAttendanceDocument, variables, headers),
+    options
+  )
+
+useFindIndividualAttendanceQuery.getKey = (
+  variables: FindIndividualAttendanceQueryVariables
+) => ['findIndividualAttendance', variables]
 export const GetAttendanceCheckDocument = `
     query getAttendanceCheck($attendanceDate: String!) {
   attendanceCheck(attendanceDate: $attendanceDate)

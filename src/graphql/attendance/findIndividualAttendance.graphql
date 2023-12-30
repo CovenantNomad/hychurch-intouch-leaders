@@ -1,0 +1,14 @@
+query findIndividualAttendance($id: ID! $minDate: String! $maxDate: String!) {
+  user(id: $id) {
+    id
+    name
+    userChurchServiceHistories(minDate: $minDate, maxDate: $maxDate) {
+      attendedAt
+      isOnline
+      churchService {
+        id
+        name
+      }
+    }
+  }
+}
