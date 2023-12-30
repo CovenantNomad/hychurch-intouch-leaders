@@ -5,13 +5,11 @@ import Layout from '@components/Atoms/Layout/Layout'
 import CellDallantScreen from '@/components/Templates/Dallant/CellDallantScreen'
 import GridMenu from '@/components/Atoms/GridMenu/GridMenu'
 import CellDayScreen from '@/components/Templates/Dallant/CellDayScreen/CellDayScreen'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { stateSetting } from '@/stores/stateSetting'
 import { dallantMenu } from '@/constants/menu'
 import Spacer from '@/components/Atoms/Spacer'
 import { stateUserInfo } from '@/stores/stateUserInfo'
-
-interface DallantPageProps {}
 
 const categories = [
   {
@@ -26,9 +24,9 @@ const categories = [
   },
 ]
 
-const DallantPage = ({}: DallantPageProps) => {
-  const setting = useRecoilValue(stateSetting)
+const DallantPage = () => {
   const userInfo = useRecoilValue(stateUserInfo)
+  const [setting, setSetting] = useRecoilState(stateSetting)
 
   return (
     <Layout>
@@ -42,10 +40,15 @@ const DallantPage = ({}: DallantPageProps) => {
       </h4>
       <Spacer size={'h-6'} />
       <div className="relative pl-4">
-        <GridMenu menuList={dallantMenu} />
+        <GridMenu
+          menuList={dallantMenu}
+          onSelectHandler={(id: number) =>
+            setSetting({ ...setting, dallantSelectedCategoryId: id })
+          }
+        />
       </div>
       <Spacer />
-      <>{categories[setting.cellSelectedCategoryId].component}</>
+      <>{categories[setting.dallantSelectedCategoryId].component}</>
     </Layout>
   )
 }

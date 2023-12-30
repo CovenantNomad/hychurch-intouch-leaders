@@ -34,11 +34,13 @@ const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
     <>
       <SectionTitle title="셀리더 정보" />
       <Spacer size={'h-3'} />
-      {userInfo ? (
-        <CellLeaderListItem userId={userInfo.id} name={userInfo.name} />
-      ) : (
-        <div>리더 정보를 가져올 수 없습니다</div>
-      )}
+      <div className="grid grid-cols-1 gap-y-3 lg:grid-cols-2 lg:gap-x-6 xl:grid-cols-3 xl:gap-x-8">
+        {userInfo ? (
+          <CellLeaderListItem userId={userInfo.id} name={userInfo.name} />
+        ) : (
+          <div className="py-4">셀리더 정보를 가져올 수 없습니다</div>
+        )}
+      </div>
       <Spacer size={'h-8'} />
       <SectionTitle title="셀원 정보" />
       <Spacer size={'h-3'} />
