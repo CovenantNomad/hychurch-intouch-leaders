@@ -1,3 +1,4 @@
+import { EvaluationSettingType } from '@/types/evalutation'
 import { useRouter } from 'next/router'
 import React from 'react'
 

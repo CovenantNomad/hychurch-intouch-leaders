@@ -20,3 +20,10 @@ export enum DALLANTS_COLLCTION {
 }
 
 export const MAX_ORDER_NUMBER = 3
+
+export enum EVALUATIONFORM_COLLCTION {
+  EVALUATIONFORM = 'EvaluationForm',
+  SETTINGS = 'Settings',
+  SUBMISSION = 'SUBMISSION',
+  MEMBERLIST = 'MEMBERLIST',
+}

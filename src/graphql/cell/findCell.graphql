@@ -11,6 +11,7 @@ query findCell($id: Float!) {
       id
       name
       phone
+      grade
       isActive
       birthday
       gender

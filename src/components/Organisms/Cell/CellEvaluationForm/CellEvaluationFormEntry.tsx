@@ -1,26 +1,38 @@
-import { useRouter } from 'next/router'
 import React from 'react'
+import CellEvaluationFormEntryHeader from './CellEvaluationFormEntryHeader'
+import CellEvaluationFormList from './CellEvaluationFormList'
+import { useCheckEvaluationPeriods } from '@/hooks/useCheckEvaluationPeriods'
 
-type CellEvaluationFormEntryProps = {}
-
-const CellEvaluationFormEntry = ({}: CellEvaluationFormEntryProps) => {
-  const router = useRouter()
+const CellEvaluationFormEntry = () => {
+  const {
+    isLoading,
+    isActive,
+    seasonName,
+    today,
+    entryStartDate,
+    entryEndDate,
+    statusCode,
+    message,
+    countDown,
+    updateEntryCountdown,
+  } = useCheckEvaluationPeriods()
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center">
-      <h1 className="text-4xl font-bold">
-        현재 페이지는
-        <br />
-        개발 중입니다
-      </h1>
-      <div className="mt-8">
-        <button
-          onClick={() => router.back()}
-          className="border px-4 py-2 rounded-md cursor-pointer"
-        >
-          뒤로
-        </button>
-      </div>
+    <div className="space-y-8">
+      <CellEvaluationFormEntryHeader
+        isLoading={isLoading}
+        isActive={isActive}
+        today={today}
+        entryStartDate={entryStartDate}
+        entryEndDate={entryEndDate}
+        statusCode={statusCode}
+        message={message}
+        countDown={countDown}
+        updateEntryCountdown={updateEntryCountdown}
+      />
+      {isActive && seasonName && (
+        <CellEvaluationFormList seasonName={seasonName} />
+      )}
     </div>
   )
 }

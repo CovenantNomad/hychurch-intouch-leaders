@@ -858,6 +858,7 @@ export type FindCellQuery = {
       id: string
       name: string
       phone: string
+      grade: UserGrade
       isActive: boolean
       birthday?: string | null
       gender?: Gender | null
@@ -905,6 +906,7 @@ export type FindMyCellMembersQuery = {
     id: string
     name: string
     phone: string
+    grade: UserGrade
     isActive: boolean
     birthday?: string | null
     gender?: Gender | null
@@ -1441,6 +1443,7 @@ export const FindCellDocument = `
       id
       name
       phone
+      grade
       isActive
       birthday
       gender
@@ -1529,6 +1532,7 @@ export const FindMyCellMembersDocument = `
     id
     name
     phone
+    grade
     isActive
     birthday
     gender

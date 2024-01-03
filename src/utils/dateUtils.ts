@@ -25,3 +25,19 @@ export function getMostRecentSunday() {
 
   return mostRecentSunday
 }
+
+export const formatTimeDifference = (time: number) => {
+  const days = Math.floor(time / (24 * 60 * 60))
+  const hours = Math.floor((time % (24 * 60 * 60)) / (60 * 60))
+  const minutes = Math.floor((time % (60 * 60)) / 60)
+  const seconds = time % 60
+
+  // return `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+  }
+}

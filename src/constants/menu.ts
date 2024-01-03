@@ -71,8 +71,8 @@ export const cellTransferTabs = [
 ]
 
 export const cellEvaluationTabs = [
-  { id: 0, title: '작성하기' },
-  { id: 1, title: '열람하기' },
+  { id: 0, title: '기존 셀원 정보\n작성하기' },
+  { id: 1, title: '새로운 셀원 정보\n열람하기' },
 ]
 
 export const AttendanceSteps = [

@@ -1,9 +1,15 @@
-import { Gender, RoleType, UserCellTransferStatus } from '@/graphql/generated'
+import {
+  Gender,
+  RoleType,
+  UserCellTransferStatus,
+  UserGrade,
+} from '@/graphql/generated'
 
-export interface Member {
+export type Member = {
   id: string
   name: string
   phone: string
+  grade: UserGrade
   isActive: boolean
   birthday?: string | null | undefined
   gender?: Gender | null | undefined
