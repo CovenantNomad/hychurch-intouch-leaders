@@ -30,9 +30,12 @@ const CellEvaluationFormEntry = () => {
         countDown={countDown}
         updateEntryCountdown={updateEntryCountdown}
       />
-      {isActive && seasonName && (
-        <CellEvaluationFormList seasonName={seasonName} />
-      )}
+      {isActive &&
+        seasonName &&
+        today.isAfter(entryStartDate) &&
+        today.isBefore(entryEndDate) && (
+          <CellEvaluationFormList seasonName={seasonName} />
+        )}
     </div>
   )
 }

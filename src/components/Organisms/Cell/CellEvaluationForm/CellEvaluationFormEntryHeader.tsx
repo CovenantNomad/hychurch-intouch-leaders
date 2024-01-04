@@ -1,10 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
-} from '@heroicons/react/20/solid'
 import Skeleton from '@/components/Atoms/Skeleton'
 import CountDown from '@/components/Atoms/CountDown/CountDown'
 import {
@@ -12,8 +6,10 @@ import {
   TCountDown,
 } from '@/hooks/useCheckEvaluationPeriods'
 import dayjs from 'dayjs'
-import ShutdownAlert from '@/components/Blocks/EvaluationForm/ShutdownAlert/ShutdownAlert'
-import DurationAlertCard from '@/components/Blocks/EvaluationForm/\bDurationAlertCard'
+import ShutdownAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/ShutdownAlert/ShutdownAlert'
+import DurationAlertCard from '@/components/Atoms/Alerts/EvaluationFormAlerts/DurationAlertCard'
+import ClosureDateAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/ClosureDateAlert'
+import PreStartDateAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/PreStartDateAlert'
 
 type CellEvaluationFormEntryHeaderProps = {
   isLoading: boolean
@@ -71,7 +67,7 @@ const CellEvaluationFormEntryHeader = ({
   return (
     <div>
       {isLoading ? (
-        <div>로딩중...</div>
+        <Skeleton className="h-[105px] lg:h-[72px] bg-gray-100" />
       ) : (
         <>
           {isActive ? (
@@ -102,44 +98,16 @@ const CellEvaluationFormEntryHeader = ({
                   {message ? (
                     <>
                       {statusCode === EntryDateStatusCode.COMPLETED && (
-                        <div className="rounded-md bg-green-50 p-4">
-                          <div className="flex">
-                            <div className="flex-shrink-0">
-                              <CheckCircleIcon
-                                className="h-5 w-5 text-green-400"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <h3 className="text-sm font-medium text-green-800">
-                                입력기간 종료
-                              </h3>
-                              <div className="mt-2 text-sm text-green-700">
-                                <p>{message}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        <ClosureDateAlert
+                          title={'입력기간 종료'}
+                          message={message}
+                        />
                       )}
                       {statusCode === EntryDateStatusCode.NOTSTARTED && (
-                        <div className="rounded-md bg-yellow-50 p-4">
-                          <div className="flex">
-                            <div className="flex-shrink-0">
-                              <ExclamationTriangleIcon
-                                className="h-5 w-5 text-yellow-400"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <h3 className="text-sm font-medium text-yellow-800">
-                                입력기간 이전
-                              </h3>
-                              <div className="mt-2 text-sm text-yellow-700">
-                                <p>{message}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        <PreStartDateAlert
+                          title={'입력기간 이전'}
+                          message={message}
+                        />
                       )}
                     </>
                   ) : (

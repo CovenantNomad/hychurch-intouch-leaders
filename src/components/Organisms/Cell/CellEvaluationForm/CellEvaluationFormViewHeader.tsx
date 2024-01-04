@@ -1,8 +1,11 @@
 import React from 'react'
 import dayjs from 'dayjs'
-import { XCircleIcon } from '@heroicons/react/20/solid'
-import ShutdownAlert from '@/components/Blocks/EvaluationForm/ShutdownAlert/ShutdownAlert'
-import DurationAlertCard from '@/components/Blocks/EvaluationForm/\bDurationAlertCard'
+import { ExclamationTriangleIcon, XCircleIcon } from '@heroicons/react/20/solid'
+import ShutdownAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/ShutdownAlert/ShutdownAlert'
+import DurationAlertCard from '@/components/Atoms/Alerts/EvaluationFormAlerts/DurationAlertCard'
+import ClosureDateAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/ClosureDateAlert'
+import PreStartDateAlert from '@/components/Atoms/Alerts/EvaluationFormAlerts/PreStartDateAlert'
+import Skeleton from '@/components/Atoms/Skeleton'
 
 type CellEvaluationFormViewHeaderProps = {
   isLoading: boolean
@@ -22,19 +25,34 @@ const CellEvaluationFormViewHeader = ({
   return (
     <div>
       {isLoading ? (
-        <div>로딩중...</div>
+        <Skeleton className="h-[105px] lg:h-[72px] bg-gray-100" />
       ) : (
         <>
-          {isActive && today.isBefore(viewingEndDate) ? (
-            <div>
-              <DurationAlertCard
-                title="셀원정보 열람기간입니다"
-                typeText="열람기간"
-                startDate={viewingStartDate}
-                endDate={viewingEndDate}
-                hasTimer={false}
-              />
-            </div>
+          {isActive ? (
+            <>
+              {today.isBefore(viewingStartDate) && (
+                <PreStartDateAlert
+                  title={'열람기간 이전'}
+                  message={'셀원정보를 열람 할 수 있는 기간이 되지 않았습니다'}
+                />
+              )}
+              {today.isAfter(viewingStartDate) &&
+                today.isBefore(viewingEndDate) && (
+                  <DurationAlertCard
+                    title="셀원정보 열람기간입니다"
+                    typeText="열람기간"
+                    startDate={viewingStartDate}
+                    endDate={viewingEndDate}
+                    hasTimer={false}
+                  />
+                )}
+              {today.isAfter(viewingEndDate) && (
+                <ClosureDateAlert
+                  title={'열람기간 종료'}
+                  message={'셀원정보를 볼 수 있는 기간이 지났습니다'}
+                />
+              )}
+            </>
           ) : (
             <ShutdownAlert
               title="셀 편성 기간이 아닙니다."

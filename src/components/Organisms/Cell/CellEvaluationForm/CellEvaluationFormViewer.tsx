@@ -24,9 +24,12 @@ const CellEvaluationFormViewer = ({}: CellEvaluationFormViewerProps) => {
         viewingStartDate={viewingStartDate}
         viewingEndDate={viewingEndDate}
       />
-      {isActive && today.isBefore(viewingEndDate) && (
-        <CellEvaluationFormViewList seasonName={seasonName} />
-      )}
+      {isActive &&
+        seasonName &&
+        today.isAfter(viewingStartDate) &&
+        today.isBefore(viewingEndDate) && (
+          <CellEvaluationFormViewList seasonName={seasonName} />
+        )}
     </div>
   )
 }
