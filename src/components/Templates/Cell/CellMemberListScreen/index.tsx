@@ -1,34 +1,19 @@
-import graphlqlRequestClient from '@/client/graphqlRequestClient'
+import React from 'react'
 import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import Spacer from '@/components/Atoms/Spacer'
 import Spinner from '@/components/Atoms/Spinner'
 import SectionTitle from '@/components/Atoms/Typography/SectionTitle'
 import CellLeaderListItem from '@/components/Organisms/Cell/CellLeaderListItem'
 import CellMemberListItem from '@/components/Organisms/Cell/CellMemberListItem'
-import {
-  FindMyCellMembersQuery,
-  FindMyCellMembersQueryVariables,
-  RoleType,
-  useFindMyCellMembersQuery,
-} from '@/graphql/generated'
+import { RoleType } from '@/graphql/generated'
 import { useAuth } from '@/hooks/useAuth'
-import React from 'react'
+import { useFindCellMembers } from '@/hooks/useFindCellMembers'
 
 interface CellMemberListScreenProps {}
 
 const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
   const { userInfo } = useAuth()
-  const { isLoading, data } = useFindMyCellMembersQuery<
-    FindMyCellMembersQuery,
-    FindMyCellMembersQueryVariables
-  >(
-    graphlqlRequestClient,
-    {},
-    {
-      staleTime: 10 * 60 * 1000,
-      cacheTime: 30 * 60 * 1000,
-    }
-  )
+  const { isLoading, isFetching, data } = useFindCellMembers()
 
   return (
     <>
@@ -44,7 +29,7 @@ const CellMemberListScreen = ({}: CellMemberListScreenProps) => {
       <Spacer size={'h-8'} />
       <SectionTitle title="셀원 정보" />
       <Spacer size={'h-3'} />
-      {isLoading ? (
+      {isLoading || isFetching ? (
         <div className="w-full py-20 flex items-center justify-center">
           <Spinner />
         </div>

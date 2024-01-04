@@ -821,7 +821,12 @@ export type MeQuery = {
     id: string
     name: string
     roles: Array<RoleType>
-    cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    cell?: {
+      __typename?: 'Cell'
+      id: string
+      name: string
+      community: string
+    } | null
   }
 }
 
@@ -847,6 +852,7 @@ export type FindCellQuery = {
     __typename?: 'Cell'
     id: string
     name: string
+    community: string
     leaders: Array<{
       __typename?: 'User'
       id: string
@@ -858,6 +864,7 @@ export type FindCellQuery = {
       id: string
       name: string
       phone: string
+      grade: UserGrade
       isActive: boolean
       birthday?: string | null
       gender?: Gender | null
@@ -905,6 +912,7 @@ export type FindMyCellMembersQuery = {
     id: string
     name: string
     phone: string
+    grade: UserGrade
     isActive: boolean
     birthday?: string | null
     gender?: Gender | null
@@ -1373,6 +1381,7 @@ export const MeDocument = `
     cell {
       id
       name
+      community
     }
   }
 }
@@ -1432,6 +1441,7 @@ export const FindCellDocument = `
   findCell(id: $id) {
     id
     name
+    community
     leaders {
       id
       name
@@ -1441,6 +1451,7 @@ export const FindCellDocument = `
       id
       name
       phone
+      grade
       isActive
       birthday
       gender
@@ -1529,6 +1540,7 @@ export const FindMyCellMembersDocument = `
     id
     name
     phone
+    grade
     isActive
     birthday
     gender

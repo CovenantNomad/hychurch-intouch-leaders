@@ -91,6 +91,7 @@ const UserInfomationForm = ({
     const birthday = `${year}-${month}-${day}`
     const registrationDate = `${newRegistrationYear}-${newRegistrationMonth}-${newRegistrationDay}`
     const isActiveStatus = isActive === '포함' ? true : false
+
     mutate({
       input: {
         id,

@@ -30,7 +30,9 @@ const Tabs = ({ tabs, tabIdx, setSelect }: TabsProps) => {
             'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-6 text-sm font-medium text-center hover:bg-gray-50 focus:z-10'
           )}
         >
-          <span>{tab.title}</span>
+          <span className="whitespace-pre-line lg:whitespace-nowrap">
+            {tab.title}
+          </span>
           <span
             aria-hidden="true"
             className={classNames(

@@ -3,6 +3,7 @@ query findMyCellMembers {
     id
     name
     phone
+    grade
     isActive
     birthday
     gender

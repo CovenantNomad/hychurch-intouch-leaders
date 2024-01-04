@@ -6,6 +6,7 @@ query me {
     cell {
       id
       name
+      community
     }
   }
 }
