@@ -12,6 +12,7 @@ export interface LoginUser {
     | {
         id: string
         name: string
+        community: string
       }
     | null
     | undefined

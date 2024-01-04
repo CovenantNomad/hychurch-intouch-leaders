@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast'
 import { useAuth } from '@/hooks/useAuth'
 import dayjs from 'dayjs'
+import CellEvaluationFormSubmissionModal from './CellEvaluationFormSubmissionModal'
 
 type CellEvaluationFormListProps = {
   seasonName: string
@@ -32,6 +33,8 @@ const CellEvaluationFormList = ({
     isFetching: isMemberFetching,
     data: cellMembers,
   } = useFindCellMembers()
+
+  const [open, setOpen] = useState(false)
 
   const [allDataStatus, setAllDataStatus] = useState({})
 
@@ -133,17 +136,22 @@ const CellEvaluationFormList = ({
         ) : (
           <button
             disabled={!isAllSaved}
-            onClick={() =>
-              mutation.mutateAsync({
-                cellId: userInfo!.cell!.id,
-              })
-            }
+            onClick={() => setOpen(true)}
             className="w-full py-3 bg-blue-600 text-white cursor-pointer disabled:bg-gray-600"
           >
             최종제출
           </button>
         )}
       </div>
+      <CellEvaluationFormSubmissionModal
+        open={open}
+        setOpen={setOpen}
+        actionHandler={() =>
+          mutation.mutateAsync({
+            cellId: userInfo!.cell!.id,
+          })
+        }
+      />
     </div>
   )
 }

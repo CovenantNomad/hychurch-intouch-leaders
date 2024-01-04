@@ -2,6 +2,7 @@ query findCell($id: Float!) {
   findCell(id: $id) {
     id
     name
+    community
     leaders {
       id
       name

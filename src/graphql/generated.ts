@@ -821,7 +821,12 @@ export type MeQuery = {
     id: string
     name: string
     roles: Array<RoleType>
-    cell?: { __typename?: 'Cell'; id: string; name: string } | null
+    cell?: {
+      __typename?: 'Cell'
+      id: string
+      name: string
+      community: string
+    } | null
   }
 }
 
@@ -847,6 +852,7 @@ export type FindCellQuery = {
     __typename?: 'Cell'
     id: string
     name: string
+    community: string
     leaders: Array<{
       __typename?: 'User'
       id: string
@@ -1375,6 +1381,7 @@ export const MeDocument = `
     cell {
       id
       name
+      community
     }
   }
 }
@@ -1434,6 +1441,7 @@ export const FindCellDocument = `
   findCell(id: $id) {
     id
     name
+    community
     leaders {
       id
       name

@@ -12,7 +12,6 @@ export const useAuth = () => {
 
   const onLogOutHandler = () => {
     queryClient.invalidateQueries({ queryKey: ['findMyCellMembers'] })
-    queryClient.invalidateQueries()
     localStorage.removeItem(INTOUCH_LEADERS_ACCESS_TOKEN)
     graphlqlRequestClient.setHeader('authorization', '')
     setUserInfo(null)

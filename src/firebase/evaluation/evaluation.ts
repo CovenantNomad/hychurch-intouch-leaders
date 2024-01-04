@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore'
 import toast from 'react-hot-toast'
 
+// 셀평가서 전체세팅 가져오기
 export const getEvalutationSettings = async () => {
   try {
     const settingRef = doc(
@@ -39,6 +40,7 @@ export const getEvalutationSettings = async () => {
   }
 }
 
+// 개인별 저장 상태 가져오기
 export const getIndividaulSubmissionStatus = async ({
   seasonName,
   userId,
@@ -68,6 +70,7 @@ export const getIndividaulSubmissionStatus = async ({
   }
 }
 
+// 셀 최종제출 상태 가져오기
 export const getCellSubmissionStatus = async ({
   seasonName,
   cellId,
@@ -100,6 +103,7 @@ export const getCellSubmissionStatus = async ({
   }
 }
 
+// 개인별 제출내용 가져오기
 export const getIndividaulEvaluationSubmission = async ({
   seasonName,
   userId,
@@ -129,6 +133,7 @@ export const getIndividaulEvaluationSubmission = async ({
   }
 }
 
+// 개인별 셀원정보 제출하기
 export const createIndividaulEvaluation = async (
   submitData: IndividualEvaluationDataType
 ) => {
@@ -180,6 +185,7 @@ export const createIndividaulEvaluation = async (
   }
 }
 
+// 셀 최종제출 하기
 export const createCellEvaluationFormFinalSubmission = async ({
   cellId,
 }: {

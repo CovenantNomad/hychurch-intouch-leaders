@@ -35,6 +35,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
   const router = useRouter()
   const { seasonName, id, userName, cellId, cellName } = router.query
 
+  //혹시 저장되었으면 해당 정보 가져오기
   const { isLoading, isFetching, data } = useQuery({
     queryKey: ['getIndividaulEvaluationSubmission', seasonName, id],
     queryFn: () =>
@@ -46,6 +47,10 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     cacheTime: 15 * 60 * 1000,
     enabled: !!seasonName && !!id,
   })
+
+  const textForFirebase = (text: string) => {
+    return text.replace(/\n/g, '\\n')
+  }
 
   const {
     handleSubmit,
@@ -78,6 +83,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     }
   )
 
+  //등급업데이트
   const { mutate } = useUpdateUserMutation(graphlqlRequestClient, {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
@@ -89,6 +95,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     },
   })
 
+  //셀원정보 저장
   const mutation = useMutation({
     mutationFn: createIndividaulEvaluation,
     onSuccess: () => {
@@ -165,7 +172,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
           : memberInfo.user.cell!.name,
         worship: data.worship,
         meeting: data.meeting,
-        description: data.description,
+        description: textForFirebase(data.description),
       })
     }
   }
