@@ -65,3 +65,11 @@ export function groupByChurchService(list: TempSavedAttendanceHistory[]) {
     return acc
   }, init)
 }
+
+export const textForFirebase = (text: string) => {
+  return text.replace(/\n/g, '\\n')
+}
+
+export const textViewForFirebaseText = (text: string) => {
+  return text.replaceAll('\\n', '\n')
+}

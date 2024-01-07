@@ -20,6 +20,7 @@ import {
   MEETING_GRADE,
   WORSHIP_TYPE,
 } from '@/types/evalutation'
+import { textForFirebase, textViewForFirebaseText } from '@/utils/utils'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { GraphQLError } from 'graphql'
@@ -47,10 +48,6 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     cacheTime: 15 * 60 * 1000,
     enabled: !!seasonName && !!id,
   })
-
-  const textForFirebase = (text: string) => {
-    return text.replace(/\n/g, '\\n')
-  }
 
   const {
     handleSubmit,
@@ -185,7 +182,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     if (data) {
       setValue('worship', data.worship)
       setValue('meeting', data.meeting)
-      setValue('description', data.description)
+      setValue('description', textViewForFirebaseText(data.description))
     }
   }, [data, setValue])
 
