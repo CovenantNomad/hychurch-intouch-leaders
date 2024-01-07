@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { IndividualEvaluationDataType } from '@/types/evalutation'
 import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
+import { textViewForFirebaseText } from '@/utils/utils'
 
 type CellEvaluationFormViewerModalProps = {
   open: boolean
@@ -91,7 +92,7 @@ const CellEvaluationFormViewerModal = ({
                         </span>
                         <div className="p-1 mt-1 border rounded-md sm:p-2">
                           <p className="text-sm text-gray-900 whitespace-pre-line">
-                            {data.description.replaceAll('\\n', '\n')}
+                            {textViewForFirebaseText(data.description)}
                           </p>
                         </div>
                       </div>
