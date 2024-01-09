@@ -23,6 +23,10 @@ export default function Document() {
         />
         <meta property="og:image" content="/images/thumbnail.png" />
         <meta name="twitter:image" content="/images/thumbnail.png" />
+        <meta
+          name="viewport"
+          content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width"
+        />
       </Head>
       <body>
         <Main />
