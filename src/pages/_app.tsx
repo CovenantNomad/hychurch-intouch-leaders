@@ -5,6 +5,7 @@ import { RecoilRoot } from 'recoil'
 import { Toaster } from 'react-hot-toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import RootApp from '@components/Templates/RootApp/RootApp'
+import { ThemeProvider } from 'next-themes'
 
 const queryClient = new QueryClient({
   defaultOptions: {

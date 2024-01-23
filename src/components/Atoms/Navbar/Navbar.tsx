@@ -64,6 +64,11 @@ const Navbar = ({}: NavbarProps) => {
               <span className="text-gray-600">🔚 로그아웃</span>
             </button>
           </div>
+          <Link href={'/help'} className="w-full text-center mt-6">
+            <span className="text-sm text-cyan-800 underline cursor-pointer">
+              리더십 사관학교
+            </span>
+          </Link>
           <div className="w-full text-center">
             <a
               href="https://cactus-flannel-eb8.notion.site/d92d59904fb847c5934ea8bc5f711594?pvs=4"

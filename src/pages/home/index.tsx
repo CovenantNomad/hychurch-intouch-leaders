@@ -58,23 +58,4 @@ const Home = ({}: HomeProps) => {
   )
 }
 
-// export async function getServerSideProps() {
-//   const getMe = gql`
-//     query me {
-//       me {
-//         id
-//         name
-//         roles
-//         cell {
-//           id
-//           name
-//         }
-//       }
-//     }
-//   `
-//   const posts = await graphQLClient.request(getMe)
-//   console.log(posts)
-//   return { props: { posts } }
-// }
-
 export default Home
