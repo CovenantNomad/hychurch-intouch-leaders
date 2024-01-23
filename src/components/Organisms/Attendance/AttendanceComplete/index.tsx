@@ -1,55 +1,98 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { AttendanceGlobalState } from '@/types/attendance'
+import { AttendanceGlobalState, AttendanceHistory } from '@/types/attendance'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getServiceName } from '@/utils/utils'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import Spacer from '@/components/Atoms/Spacer'
+import { cn } from '@/lib/utils'
+import { formatKoreanDate } from '@/utils/dateUtils'
 
-interface AttendanceCompleteProps {
+type AttendanceCompleteProps = {
   attendance: AttendanceGlobalState
+}
+
+type GroupedAttendance = {
+  [key: string]: AttendanceHistory[]
 }
 
 const AttendanceComplete = ({ attendance }: AttendanceCompleteProps) => {
   const router = useRouter()
+  const [groupedAttendance, setGroupedAttendance] = useState<GroupedAttendance>(
+    {}
+  )
 
   const onCloseHandler = useCallback(() => {
     router.push('/home')
   }, [])
 
+  const groupAttendanceByService = (
+    attendanceList: AttendanceHistory[] | null
+  ): GroupedAttendance => {
+    const grouped: GroupedAttendance = {}
+
+    if (attendanceList) {
+      attendanceList.forEach((history) => {
+        const serviceId = history.churchService.id
+        if (!grouped[serviceId]) {
+          grouped[serviceId] = []
+        }
+        grouped[serviceId].push(history)
+      })
+    }
+
+    return grouped
+  }
+
+  useEffect(() => {
+    const groupedList = groupAttendanceByService(attendance.attendanceList)
+    setGroupedAttendance(groupedList)
+  }, [attendance.attendanceList])
+
   return (
     <div>
-      <h6 className="mt-8 underline-offset-4 underline">
-        예배출석 일자 : {attendance.submitDate}
-      </h6>
-      <h6 className="mt-6 font-bold">제출명단</h6>
-      <div className="mt-2 bg-gray-50 shadow-sm divide-y divide-gray-100">
-        {attendance.attendanceList !== null &&
-          attendance.attendanceList.length !== 0 && (
-            <ul>
-              {attendance.attendanceList.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between items-center px-4 py-5 hover:bg-gray-100 sm:px-6"
-                >
-                  <p>{item.user.name}</p>
-                  <p>
-                    {item.churchService.name}
-                    <span
-                      className={`rounded-md whitespace-nowrap ml-2.5 px-1.5 py-0.5 text-xs font-medium ${
-                        item.isOnline
-                          ? 'bg-red-50 text-red-700'
-                          : 'bg-blue-50 text-blue-700'
-                      }`}
-                    >
-                      {item.isOnline ? '온라인' : '성전'}
-                    </span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+      <Alert>
+        <AlertTitle>예배 출석체크 완료!</AlertTitle>
+        <AlertDescription>
+          <span className="text-bold underline">
+            {formatKoreanDate(attendance.submitDate)}
+          </span>{' '}
+          제출명단은 아래에서 확인할 수 있습니다
+        </AlertDescription>
+      </Alert>
+      <div className="mt-4 space-y-2 lg:mt-8 lg:space-y-4">
+        {Object.keys(groupedAttendance).map((serviceId) => (
+          <Card key={serviceId}>
+            <CardHeader className="p-4">
+              <CardTitle className="text-lg">
+                {getServiceName(serviceId)}{' '}
+                <span className="text-base ml-1">
+                  ({groupedAttendance[serviceId].length}명)
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-4 gap-4 px-4 lg:grid-cols-6">
+              {groupedAttendance[serviceId]
+                .sort((a, b) => a.user.name.localeCompare(b.user.name))
+                .map((member) => (
+                  <div
+                    key={member.id}
+                    className={cn(
+                      'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border transition-colors focus-visible:outline-none bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2',
+                      `${member.isOnline ? 'bg-yellow-50' : 'bg-blue-50'}`
+                    )}
+                  >
+                    {member.user.name}
+                  </div>
+                ))}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-      <div className="mt-16">
+      <div className="mt-8">
         <button
           onClick={onCloseHandler}
-          className="w-full bg-blue-500 text-white py-3"
+          className="w-full bg-blue-500 text-white py-2 text-sm rounded-lg"
         >
           홈으로
         </button>

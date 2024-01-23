@@ -100,12 +100,12 @@ const AttendancePreview = ({
   }, [attendance])
 
   return (
-    <div>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:items-center">
+    <div className="mt-4">
+      <div className="">
+        <div className="border px-4 py-3 sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-base font-semibold leading-6 text-gray-900">
-              {userInfo?.cell?.name} 출석체크
+              {userInfo?.cell?.name} 출석체크 요약
             </h1>
             <p className="mt-2 text-sm text-gray-700 whitespace-pre-line leading-6">
               {`${attendance.submitDate} 예배출석을 아래와 같이 제출합니다.\n임시저장 또는 최종제출을 눌러 저장해주세요.`}
@@ -113,7 +113,7 @@ const AttendancePreview = ({
           </div>
         </div>
         {attendance.tempAttendanceList ? (
-          <div className="-mx-4 mt-8 flow-root sm:mx-0">
+          <div className="-mx-4 mt-4 flow-root sm:mx-0 px-4 sm:px-6 lg:px-8">
             <table className="min-w-full">
               <colgroup>
                 <col className="w-3/6 sm:w-3/6" />

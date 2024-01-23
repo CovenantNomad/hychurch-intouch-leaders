@@ -30,12 +30,12 @@ const Home = ({}: HomeProps) => {
           {userInfo?.name} 리더님 👋
         </h4>
         <Spacer size={'h-3'} />
-        <p className="text-xl font-nanumBrush font-bold tracking-wide bg-lightgreen py-4 rounded-lg text-center">
-          <span className="block font-poppins text-xs uppercase mb-1">
-            2023 anointing hwayang vision
+        <p className="text-base font-nanumBrush font-bold tracking-wide bg-lightgreen py-4 rounded-lg text-center">
+          <span className="block font-poppins text-xs uppercase mb-1 text-rose-800">
+            2024 상반기 인터치 비전
           </span>
-          부흥,
-          <br /> 네 입을 크게 열라 내가 채우리라
+          예수 그리스도 안에서
+          <br /> 삶이 예배가 되고 예배가 삶이 되는 워십마스터
         </p>
         <Spacer />
         <h5 className="text-xl pl-3">
@@ -57,24 +57,5 @@ const Home = ({}: HomeProps) => {
     </Layout>
   )
 }
-
-// export async function getServerSideProps() {
-//   const getMe = gql`
-//     query me {
-//       me {
-//         id
-//         name
-//         roles
-//         cell {
-//           id
-//           name
-//         }
-//       }
-//     }
-//   `
-//   const posts = await graphQLClient.request(getMe)
-//   console.log(posts)
-//   return { props: { posts } }
-// }
 
 export default Home

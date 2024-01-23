@@ -18,51 +18,17 @@ import InformationAlerts from '@/components/Atoms/Alerts/InformationAlerts'
 import DescriptionAlerts from '@/components/Atoms/Alerts/DescriptionAlerts'
 import Spinner from '@/components/Atoms/Spinner'
 //etc..
-import { AttendanceSteps } from '@/constants/menu'
+
 import { AttendanceStatus } from '@/types/attendance'
+import AttendanceStatusOverView from '@/components/Organisms/Attendance/AttendanceStatusOverView'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import WorshipAttendance from '@/components/Templates/Attendance/WorshipAttendance'
+import CellMeetingAttendance from '@/components/Templates/Attendance/CellMeetingAttendance'
 
 interface AttendanceProps {}
 
 const AttendancePage = ({}: AttendanceProps) => {
   const userInfo = useRecoilValue(stateUserInfo)
-  const {
-    isLoading,
-    attendance,
-    setAttendance,
-    onCheckHandler,
-    onToggleHander,
-    onRemoveHandler,
-    onTemporarySaveHandler,
-    onSubmitHandler,
-  } = useAttendance()
-  const [stepIdx, setStepIdx] = useState<number>(0)
-  const categories = [
-    {
-      id: 0,
-      name: 'Attendance',
-      component: (
-        <AttendanceForm
-          setStepIdx={setStepIdx}
-          attendance={attendance}
-          onCheckHandler={onCheckHandler}
-          onToggleHander={onToggleHander}
-        />
-      ),
-    },
-    {
-      id: 1,
-      name: 'Preview',
-      component: (
-        <AttendancePreview
-          setStepIdx={setStepIdx}
-          attendance={attendance}
-          onRemoveHandler={onRemoveHandler}
-          onTemporarySaveHandler={onTemporarySaveHandler}
-          onSubmitHandler={onSubmitHandler}
-        />
-      ),
-    },
-  ]
 
   return (
     <Layout>
@@ -76,47 +42,23 @@ const AttendancePage = ({}: AttendanceProps) => {
         </h4>
         <Spacer size={'h-4 lg:h-8'} />
         <InformationAlerts
-          description={`셀원 출석체크는 매주 화요일까지 제출해주세요!\n수요일부터 수정 및 제출이 불가합니다`}
+          description={`출석체크는 매주 화요일까지 제출해주세요!\n출석체크가 완료되지 않으면 새가족 배정을 못합니다`}
         />
         <Spacer size={'h-6 lg:h-8'} />
-        {attendance.status === AttendanceStatus.COMPLETE ? (
-          <>
-            <SuccessAlerts description="이번주 출석체크 제출을 완료하였습니다." />
-            <AttendanceComplete attendance={attendance} />
-          </>
-        ) : (
-          <>
-            {attendance.status === AttendanceStatus.NOT_SUBMITTED && (
-              <ListAlerts title={'이번주 예배출석을 확인하지 않았습니다'}>
-                <li>{attendance.submitDate} 출석체크를 제출해주세요</li>
-              </ListAlerts>
-            )}
-            {attendance.status === AttendanceStatus.TEMPORARY_SAVE && (
-              <DescriptionAlerts
-                description="작성 중인 출석체크가 존재합니다."
-                accentText="이어서 출석체크를 작성하시고 최종제출 해주세요"
-              />
-            )}
-            <Spacer size={'h-6 lg:h-12'} />
-            <div>
-              {isLoading ? (
-                <div className="flex justify-center items-center pt-12 pb-12">
-                  <Spinner />
-                </div>
-              ) : (
-                <>
-                  <Steps
-                    steps={AttendanceSteps}
-                    stepIdx={stepIdx}
-                    setSelect={setStepIdx}
-                  />
-                  <Spacer size={'h-6 lg:h-8'} />
-                  {categories[stepIdx].component}
-                </>
-              )}
-            </div>
-          </>
-        )}
+        <AttendanceStatusOverView userInfo={userInfo} />
+        <Spacer size={'h-6 lg:h-8'} />
+        <Tabs defaultValue="worship">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="worship">예배출석</TabsTrigger>
+            <TabsTrigger value="cellmeeting">셀모임출석</TabsTrigger>
+          </TabsList>
+          <TabsContent value="worship">
+            <WorshipAttendance />
+          </TabsContent>
+          <TabsContent value="cellmeeting">
+            <CellMeetingAttendance userInfo={userInfo} />
+          </TabsContent>
+        </Tabs>
       </Container>
     </Layout>
   )

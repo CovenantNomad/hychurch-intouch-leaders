@@ -5,6 +5,7 @@ import {
   FindChurchServicesQueryVariables,
   FindMyCellMembersQuery,
   FindMyCellMembersQueryVariables,
+  RoleType,
   useFindChurchServicesQuery,
   useFindMyCellMembersQuery,
 } from '@/graphql/generated'
@@ -18,8 +19,9 @@ import FullWidthButton from '@/components/Atoms/Buttons/FullWidthButton'
 // utils
 import { classNames } from '@/utils/utils'
 import { AttendanceGlobalState } from '@/types/attendance'
+import AttendnaceItem from '@/components/Blocks/AttendnaceItem'
 
-interface onCheckHandlerPrps {
+interface onCheckHandlerProps {
   checked: boolean
   churchServiceId: string
   userId: string
@@ -40,7 +42,7 @@ interface AttendanceFormProps {
     churchServiceId,
     userId,
     userName,
-  }: onCheckHandlerPrps) => void
+  }: onCheckHandlerProps) => void
   onToggleHander: ({ userId, churchServiceId }: onToggleHandlerPrps) => void
 }
 
@@ -96,168 +98,98 @@ const AttendanceForm = ({
           <Spinner />
         </div>
       ) : (
-        <div className="mt-4 border-t border-gray-200">
-          {data?.findChurchServices.map((service) => (
-            <Disclosure
-              key={service.id}
-              as="div"
-              className="border-t border-gray-200 px-4 py-6"
-            >
-              {({ open }) => (
-                <>
-                  <h3 className="-mx-2 -my-3 flow-root">
-                    <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                      <div className="flex items-center">
-                        <span className="font-medium text-gray-900">
-                          {service.name} ({service.startAt.split(':')[0]}:
-                          {service.startAt.split(':')[1]})
-                        </span>
-                        {attendance.tempAttendanceList !== null &&
-                          attendance.tempAttendanceList.filter(
-                            (item) => item.churchServiceId === service.id
-                          ).length !== 0 && (
-                            <span className="font-medium text-gray-900 ml-4">
-                              (
-                              {
-                                attendance.tempAttendanceList.filter(
-                                  (item) => item.churchServiceId === service.id
-                                ).length
-                              }
-                              명 출석)
-                            </span>
-                          )}
-                      </div>
-                      <span className="ml-6 flex items-center">
-                        {open ? (
-                          <AiOutlineMinus width={20} height={20} />
-                        ) : (
-                          <AiOutlinePlus width={20} height={20} />
-                        )}
-                      </span>
-                    </Disclosure.Button>
-                  </h3>
-                  <Disclosure.Panel className="pt-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 lg:gap-x-16">
-                      {cellMember?.myCellMembers?.map((member) => (
-                        <div
-                          key={member.id}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex items-center">
-                            <input
-                              id={`${service.id}-${member.id}`}
-                              type="checkbox"
-                              onChange={(e) =>
-                                onCheckHandler({
-                                  checked: e.target.checked,
-                                  userId: member.id,
-                                  userName: member.name,
-                                  churchServiceId: service.id,
-                                  isOnline: false,
-                                })
-                              }
-                              checked={
-                                attendance.tempAttendanceList !== null &&
-                                attendance.tempAttendanceList.find(
-                                  (item) =>
-                                    item.churchServiceId === service.id &&
-                                    item.userId === member.id
-                                )
-                                  ? true
-                                  : false
-                              }
-                              value={member.id}
-                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor={`${service.id}-${member.id}`}
-                              className="ml-3 min-w-0 flex-1 text-gray-500"
-                            >
-                              {member.name}
-                            </label>
-                          </div>
+        <>
+          <div className="mt-4 border-x border-b rounded-lg border-gray-200">
+            {data?.findChurchServices.map((service) => (
+              <Disclosure
+                key={service.id}
+                as="div"
+                className="border-t px-4 py-6 rounded-lg"
+              >
+                {({ open }) => (
+                  <>
+                    <h3 className="-mx-2 -my-3 flow-root">
+                      <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                        <div className="flex items-center">
+                          <span className="font-medium text-gray-900">
+                            {service.name} ({service.startAt.split(':')[0]}:
+                            {service.startAt.split(':')[1]})
+                          </span>
                           {attendance.tempAttendanceList !== null &&
-                            attendance.tempAttendanceList.find(
-                              (item) =>
-                                item.churchServiceId === service.id &&
-                                item.userId === member.id
-                            ) && (
-                              <Switch.Group
-                                as="div"
-                                className="flex items-center"
-                              >
-                                <Switch
-                                  checked={
-                                    attendance.attendanceList !== null &&
-                                    attendance.tempAttendanceList.find(
-                                      (item) =>
-                                        item.churchServiceId === service.id &&
-                                        item.userId === member.id
-                                    )?.isOnline
-                                  }
-                                  onChange={() =>
-                                    onToggleHander({
-                                      churchServiceId: service.id,
-                                      userId: member.id,
-                                    })
-                                  }
-                                  className={classNames(
-                                    attendance.tempAttendanceList !== null &&
-                                      attendance.tempAttendanceList.find(
-                                        (item) =>
-                                          item.churchServiceId === service.id &&
-                                          item.userId === member.id
-                                      )?.isOnline
-                                      ? 'bg-blue-500'
-                                      : 'bg-gray-200',
-                                    'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2'
-                                  )}
-                                >
-                                  <span
-                                    aria-hidden="true"
-                                    className={classNames(
-                                      attendance.tempAttendanceList !== null &&
-                                        attendance.tempAttendanceList.find(
-                                          (item) =>
-                                            item.churchServiceId ===
-                                              service.id &&
-                                            item.userId === member.id
-                                        )?.isOnline
-                                        ? 'translate-x-5'
-                                        : 'translate-x-0',
-                                      'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
-                                    )}
-                                  />
-                                </Switch>
-                                <Switch.Label
-                                  as="span"
-                                  className="ml-3 text-sm"
-                                >
-                                  <span className="text-gray-500">
-                                    온라인예배
-                                  </span>
-                                </Switch.Label>
-                              </Switch.Group>
+                            attendance.tempAttendanceList.filter(
+                              (item) => item.churchServiceId === service.id
+                            ).length !== 0 && (
+                              <span className="font-medium text-gray-900 ml-4">
+                                (
+                                {
+                                  attendance.tempAttendanceList.filter(
+                                    (item) =>
+                                      item.churchServiceId === service.id
+                                  ).length
+                                }
+                                명 출석)
+                              </span>
                             )}
                         </div>
-                      ))}
-                    </div>
-                  </Disclosure.Panel>
-                </>
-              )}
-            </Disclosure>
-          ))}
+                        <span className="ml-6 flex items-center">
+                          {open ? (
+                            <AiOutlineMinus width={20} height={20} />
+                          ) : (
+                            <AiOutlinePlus width={20} height={20} />
+                          )}
+                        </span>
+                      </Disclosure.Button>
+                    </h3>
+                    <Disclosure.Panel className="pt-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-6 lg:gap-x-16">
+                        {cellMember?.myCellMembers
+                          ?.filter((member) =>
+                            member.roles.includes(RoleType.CellLeader)
+                          )
+                          .map((member) => (
+                            <AttendnaceItem
+                              key={member.id}
+                              service={service}
+                              member={member}
+                              attendance={attendance}
+                              onCheckHandler={onCheckHandler}
+                              onToggleHander={onToggleHander}
+                            />
+                          ))}
+                        {cellMember?.myCellMembers
+                          ?.filter(
+                            (member) =>
+                              !member.roles.includes(RoleType.CellLeader)
+                          )
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((member) => (
+                            <AttendnaceItem
+                              key={member.id}
+                              service={service}
+                              member={member}
+                              attendance={attendance}
+                              onCheckHandler={onCheckHandler}
+                              onToggleHander={onToggleHander}
+                            />
+                          ))}
+                      </div>
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
+            ))}
+          </div>
           <div className="mt-8">
             <FullWidthButton onClick={() => setModalOpen(true)}>
-              저장
+              다음
             </FullWidthButton>
           </div>
-        </div>
+        </>
       )}
       <SimpleModal
         title={'출석체크'}
-        description={'예배출석을 저장하겠습니까?'}
-        actionLabel={'저장'}
+        description={'모든 셀원들에 대한 출석을 체크하셨나요?'}
+        actionLabel={'다음'}
         open={modalOpen}
         setOpen={setModalOpen}
         actionHandler={onSavingHandler}
