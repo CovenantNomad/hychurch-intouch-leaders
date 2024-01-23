@@ -16,7 +16,10 @@ const AttendanceStatusOverView = ({
 }: AttendanceStatusOverViewProps) => {
   const { attendance } = useAttendance()
   const { isCellMeetingSubmissionLoading, cellMeetingSubmission } =
-    useCellMeeting({ cellId: String(userInfo?.cell?.id) })
+    useCellMeeting({
+      cellId: String(userInfo?.cell?.id),
+      cellName: String(userInfo?.cell?.name),
+    })
 
   return (
     <Card className="lg:flex lg:justify-between lg:items-center">
