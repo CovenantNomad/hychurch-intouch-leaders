@@ -10,8 +10,8 @@ const CellStatsGroup = ({ totalNumber, activeNumber }: CellStatsGroupProps) => {
   return (
     <div className="grid grid-cols-3 gap-x-4">
       <SimpleStats title="전체인원" number={totalNumber} />
-      <SimpleStats title="활동인원" number={activeNumber} />
-      <SimpleStats title="비활동인원" number={totalNumber - activeNumber} />
+      <SimpleStats title="셀보고서 포함" number={activeNumber} />
+      <SimpleStats title="미포함" number={totalNumber - activeNumber} />
     </div>
   )
 }

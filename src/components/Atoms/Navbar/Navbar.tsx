@@ -64,6 +64,16 @@ const Navbar = ({}: NavbarProps) => {
               <span className="text-gray-600">🔚 로그아웃</span>
             </button>
           </div>
+          <div className="w-full text-center">
+            <a
+              href="https://cactus-flannel-eb8.notion.site/d92d59904fb847c5934ea8bc5f711594?pvs=4"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-cyan-800 underline cursor-pointer"
+            >
+              인터치 리더스 사용설명서
+            </a>
+          </div>
         </div>
       )}
     </>

@@ -16,28 +16,30 @@ const queryClient = new QueryClient({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
-        <RootApp>
-          <Component {...pageProps} />
-          <Toaster
-            toastOptions={{
-              success: {
-                style: {
-                  background: '#fff',
-                  color: '#222',
+    <>
+      <RecoilRoot>
+        <QueryClientProvider client={queryClient}>
+          <RootApp>
+            <Component {...pageProps} />
+            <Toaster
+              toastOptions={{
+                success: {
+                  style: {
+                    background: '#fff',
+                    color: '#222',
+                  },
                 },
-              },
-              error: {
-                style: {
-                  background: '#fff',
-                  color: '#222',
+                error: {
+                  style: {
+                    background: '#fff',
+                    color: '#222',
+                  },
                 },
-              },
-            }}
-          />
-        </RootApp>
-      </QueryClientProvider>
-    </RecoilRoot>
+              }}
+            />
+          </RootApp>
+        </QueryClientProvider>
+      </RecoilRoot>
+    </>
   )
 }

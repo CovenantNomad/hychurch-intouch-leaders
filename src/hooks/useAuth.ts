@@ -14,6 +14,7 @@ export const useAuth = () => {
     queryClient.invalidateQueries({ queryKey: ['findMyCellMembers'] })
     localStorage.removeItem(INTOUCH_LEADERS_ACCESS_TOKEN)
     graphlqlRequestClient.setHeader('authorization', '')
+    queryClient.clear()
     setUserInfo(null)
     router.push('/')
   }
