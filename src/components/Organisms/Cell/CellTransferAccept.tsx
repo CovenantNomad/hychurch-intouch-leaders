@@ -37,23 +37,16 @@ const CellTransferAccept = ({
   const { data, isLoading } = useFindUserCellTransferRequestQuery<
     FindUserCellTransferRequestQuery,
     FindUserCellTransferRequestQueryVariables
-  >(
-    graphlqlRequestClient,
-    {
-      id: Number(userInfo?.cell?.id),
-      transferInStatus: [UserCellTransferStatus.Ordered],
-      transferInDateFilter: {
-        between: {
-          min: datafilter.min,
-          max: datafilter.max,
-        },
+  >(graphlqlRequestClient, {
+    id: Number(userInfo?.cell?.id),
+    transferInStatus: [UserCellTransferStatus.Ordered],
+    transferInDateFilter: {
+      between: {
+        min: datafilter.min,
+        max: datafilter.max,
       },
     },
-    {
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
-    }
-  )
+  })
 
   return (
     <div>
