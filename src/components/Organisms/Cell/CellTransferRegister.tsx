@@ -59,27 +59,20 @@ const CellTransferRegister = ({
   const { data, isLoading } = useFindUserCellTransferRegisterQuery<
     FindUserCellTransferRegisterQuery,
     FindUserCellTransferRegisterQueryVariables
-  >(
-    graphlqlRequestClient,
-    {
-      id: Number(userInfo?.cell?.id),
-      limit: FIND_CELLS_LIMIT,
-      transferOutStatus: [
-        UserCellTransferStatus.Ordered,
-        UserCellTransferStatus.Confirmed,
-      ],
-      transferOutDateFilter: {
-        between: {
-          min: datafilter.min,
-          max: datafilter.max,
-        },
+  >(graphlqlRequestClient, {
+    id: Number(userInfo?.cell?.id),
+    limit: FIND_CELLS_LIMIT,
+    transferOutStatus: [
+      UserCellTransferStatus.Ordered,
+      UserCellTransferStatus.Confirmed,
+    ],
+    transferOutDateFilter: {
+      between: {
+        min: datafilter.min,
+        max: datafilter.max,
       },
     },
-    {
-      staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
-    }
-  )
+  })
 
   const { mutate } = useCreateUserCellTransferMutation<
     CreateUserCellTransferMutation,
