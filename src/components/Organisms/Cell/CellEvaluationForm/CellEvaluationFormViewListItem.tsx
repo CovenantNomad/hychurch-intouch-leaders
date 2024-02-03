@@ -38,7 +38,7 @@ const CellEvaluationFormViewListItem = ({
         <div className="space-x-2">
           <span>{userName}</span>
           <span className="text-sm">
-            {gender === Gender.Man ? '형재' : '자매'}
+            {gender === Gender.Man ? '형제' : '자매'}
           </span>
         </div>
         <div className="flex items-center gap-x-3">

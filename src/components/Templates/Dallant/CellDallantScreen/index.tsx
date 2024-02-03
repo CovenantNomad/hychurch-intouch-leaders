@@ -68,7 +68,6 @@ const CellDallantScreen = ({}: CellDallantScreenProps) => {
           )}
         </>
       )}
-      <Spacer size={'h-6 lg:h-8'} />
     </Container>
   )
 }

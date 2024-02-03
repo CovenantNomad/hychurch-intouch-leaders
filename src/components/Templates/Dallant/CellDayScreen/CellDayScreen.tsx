@@ -7,11 +7,15 @@ import CellDayCartScreen from '../CellDayCartScreen'
 import { getDallentSetting } from '@/firebase/dallant/dallant'
 import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
+import Spacer from '@/components/Atoms/Spacer'
+import { useRecoilValue } from 'recoil'
+import { stateUserInfo } from '@/stores/stateUserInfo'
 // import CellDayNoticeScreen from '../CellDayNoticeScreen'
 
 interface CellDayScreenProps {}
 
 const CellDayScreen = ({}: CellDayScreenProps) => {
+  const userInfo = useRecoilValue(stateUserInfo)
   const [tabIdx, setTabIdx] = useState<number>(0)
   const { isLoading, isFetching, data } = useQuery(
     ['getDallentSetting'],
@@ -41,9 +45,17 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
   ]
 
   return (
-    <div>
+    <Container>
+      <Spacer size={'h-3 lg:h-6'} />
+      <h2 className="flex items-center gap-x-3 text-2xl font-bold tracking-wide">
+        {userInfo?.cell?.name || '셀이름'}{' '}
+        <span className="text-sm font-medium bg-gray-100 py-1 px-3 rounded-3xl">
+          셀모임의 날
+        </span>
+      </h2>
+      <Spacer size={'h-6'} />
       {isLoading || isFetching ? (
-        <div className="flex justify-center items-center py-12 animate-bounce">
+        <div className="flex justify-center items-center py-6 animate-bounce">
           인터치 잇츠 지금 시작됩니다...
         </div>
       ) : (
@@ -57,7 +69,7 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
                 </>
               ) : (
                 <Container>
-                  <div className="flex flex-col justify-center items-center py-12">
+                  <div className="flex flex-col justify-center items-center">
                     <Image
                       src={'/images/close.png'}
                       width={163}
@@ -70,7 +82,7 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
               )}
             </>
           ) : (
-            <div className="text-center pt-16 pb-8 lg:pt-20 lg:pb-8">
+            <div className="text-center">
               <h1 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                 시즌아웃
               </h1>
@@ -83,7 +95,7 @@ const CellDayScreen = ({}: CellDayScreenProps) => {
           )}
         </div>
       )}
-    </div>
+    </Container>
   )
 }
 
