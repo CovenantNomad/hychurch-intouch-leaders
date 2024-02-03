@@ -32,11 +32,7 @@ const CellTransferAcceptListItem = ({
       queryClient.invalidateQueries({
         queryKey: ['findUserCellTransferResult'],
       })
-      toast.success(
-        `이동요청이 ${getTransferStatus(
-          data.updateUserCellTransfer.userCellTransfer.status
-        )}되었습니다`
-      )
+      toast.success(`이동요청이 승인 되었습니다`)
     },
     onError(errors: GraphQLError) {
       console.log(errors)

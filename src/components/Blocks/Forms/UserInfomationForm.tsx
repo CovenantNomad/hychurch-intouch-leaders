@@ -57,17 +57,20 @@ const UserInfomationForm = ({
 }: UpdateUserInfomationProps) => {
   const today = dayjs()
   const queryClient = useQueryClient()
+
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<EditForm>()
+
   const { mutate, isLoading } = useUpdateUserMutation(graphlqlRequestClient, {
     onSuccess: (data) => {
       toast.success('정보가 수정되었습니다')
       queryClient.invalidateQueries({
         queryKey: ['findMyCellMember', { id: id }],
       })
+      editModeHandler(false)
     },
     onError: (errors: GraphQLError) => {
       toast.error(`해당 청년 정보를 수정 중 오류가 발생하였습니다.`)
