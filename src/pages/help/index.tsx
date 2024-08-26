@@ -1,28 +1,27 @@
-import React from 'react'
-import Spacer from '@/components/Atoms/Spacer'
-import Layout from '@/components/Atoms/Layout/Layout'
 import Container from '@/components/Atoms/Container/Container'
-import Link from 'next/link'
+import Layout from '@/components/Atoms/Layout/Layout'
+import Spacer from '@/components/Atoms/Spacer'
 import Head from 'next/head'
+import Link from 'next/link'
 
 const data = [
   {
     id: 0,
-    theme: '2024 상반기\n리더십 사관학교',
-    title: '2024 상반기 비전나눔',
+    theme: '2024\n리더십 사관학교',
+    title: '2024 비전나눔',
     slug: 'vision',
     numOfImages: 2,
   },
   {
     id: 1,
-    theme: '2024 상반기\n리더십 사관학교',
+    theme: '2024\n리더십 사관학교',
     title: '2024 인터치 교회 매뉴얼',
     slug: 'manual',
     numOfImages: 4,
   },
   {
     id: 2,
-    theme: '2024 상반기\n리더십 사관학교',
+    theme: '2024\n리더십 사관학교',
     title: '은혜로운 셀리더 생활',
     slug: 'leader',
     numOfImages: 2,
@@ -60,7 +59,7 @@ const HelpPage = () => {
                   <span className="block text-[#94311C] font-bold">
                     {item.theme.split('\n')[0]}
                   </span>
-                  <span className="block ml-6 text-[#5B7A6A] font-bold">
+                  <span className="block text-[#5B7A6A] font-bold">
                     {item.theme.split('\n')[1]}
                   </span>
                   <span className="block text-center mt-12 font-bold lg:mt-8">

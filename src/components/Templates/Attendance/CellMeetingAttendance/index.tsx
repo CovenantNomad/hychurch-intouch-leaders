@@ -1,10 +1,14 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 //hooks
 import useCellMeeting from '@/hooks/useCellMeeting'
 //types
 import { LoginUser } from '@/types/auth'
 //components
+import Skeleton from '@/components/Atoms/Skeleton'
+import Spacer from '@/components/Atoms/Spacer'
+import Spinner from '@/components/Atoms/Spinner'
 import CellMeetingAttendanceForm from '@/components/Organisms/Attendance/CellMeetingAttendanceForm'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,14 +20,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Spacer from '@/components/Atoms/Spacer'
-import Spinner from '@/components/Atoms/Spinner'
-import { AlertCircle } from 'lucide-react'
-import Skeleton from '@/components/Atoms/Skeleton'
-import { useRouter } from 'next/router'
 import { formatKoreanDate } from '@/utils/dateUtils'
+import { AlertCircle } from 'lucide-react'
+import { useRouter } from 'next/router'
 
 type CellMeetingAttendanceProps = {
   userInfo: LoginUser | null
@@ -31,6 +31,7 @@ type CellMeetingAttendanceProps = {
 
 const CellMeetingAttendance = ({ userInfo }: CellMeetingAttendanceProps) => {
   const {
+    isSubmitting,
     isCellMeetingSubmissionLoading,
     isCellMembersLoading,
     cellMeetingSubmission,
@@ -164,21 +165,19 @@ const CellMeetingAttendance = ({ userInfo }: CellMeetingAttendanceProps) => {
                           >
                             제출
                           </AlertDialogTrigger>
-                          <AlertDialogContent>
+                          <AlertDialogContent className="w-[94%]">
                             <AlertDialogHeader>
                               <AlertDialogTitle>
                                 셀모임 출석체크 제출 하시겠습니까?
                               </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                셀모임 출석체크를 제출하겠습니다. 한 영혼도
-                                빠지지 않도록 정확하게 확인해주시고
-                                제출해주세요.
+                              <AlertDialogDescription className="whitespace-pre-wrap">
+                                {`셀모임 출석체크를 제출하겠습니다.\n한 영혼도 빠지지 않도록 정확하게 확인 후 제출해주세요`}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>취소</AlertDialogCancel>
                               <AlertDialogAction onClick={onSaveHandler}>
-                                제출
+                                {isSubmitting ? '제출 중...' : '제출'}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
