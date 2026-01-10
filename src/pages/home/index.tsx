@@ -31,9 +31,9 @@ const Home = ({}: HomeProps) => {
         <Spacer size={'h-3'} />
         <p className="text-base font-nanumBrush font-bold tracking-wide bg-lightgreen py-4 rounded-lg text-center">
           <span className="block font-poppins text-xs uppercase mb-1 text-rose-800">
-            2025 인터치 비전
+            2026 인터치 비전
           </span>
-          내 삶의 주인 예수 그리스도
+          일어나 빛을 발하라
         </p>
         <Spacer />
         <h5 className="text-xl pl-3">
