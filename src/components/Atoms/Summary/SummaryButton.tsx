@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface SummaryButtonProps {
   label: string
   onClick: () => void
@@ -18,8 +16,8 @@ const SummaryButton = ({
       disabled={disabled}
       onClick={onClick}
       className={`w-full rounded-md border border-transparent ${
-        isSecondaryButton ? 'bg-red-600' : 'bg-[#B0D1D4]'
-      } py-3 px-4 text-base font-poppins font-medium text-white shadow-sm focus:outline-none disabled:bg-stone-300`}
+        isSecondaryButton ? 'bg-red-500' : 'bg-teal-500'
+      } py-3 px-4 text-sm font-poppins font-medium text-white shadow-sm focus:outline-none disabled:bg-stone-300`}
     >
       {label}
     </button>

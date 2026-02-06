@@ -1,5 +1,3 @@
-import { StepStatus } from '@/types/common'
-
 export interface menuType {
   id: number
   title: string

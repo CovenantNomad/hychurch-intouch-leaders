@@ -406,6 +406,7 @@ export type QueryFindCellsArgs = {
 }
 
 export type QueryFindUsersArgs = {
+  keyword?: InputMaybe<Scalars['String']>
   limit?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Scalars['String']>
   offset?: InputMaybe<Scalars['Int']>
@@ -447,7 +448,10 @@ export type RegisterNewUserPayload = {
 }
 
 export type RemoveUserFromSeedlingCellInput = {
+  /** 사유 카테고리 */
   reason: Scalars['String']
+  /** 상세 사유(기타 카테고리에서 사용) */
+  reasonDetail?: InputMaybe<Scalars['String']>
   userId: Scalars['ID']
 }
 
@@ -690,18 +694,20 @@ export type UserChurchServiceHistoryInput = {
 }
 
 export enum UserGrade {
-  /** 예배출석, 셀모임 모두 잘 하시는 분들 */
+  /** 인터치 예배와 셀모임 모두 잘 참석하는 인원의 등급 */
   A = 'A',
-  /** 예배출석, 셀모임 중 하나만 꾸준하거나 하는 분들(명확한 기준은 없음…) */
+  /** 셀모임 미참석하는 인원의 등급1 (셀장평가에 의해 결정) */
   B = 'B',
-  /** 셀 배정은 되었으나 활동을 잘 안하는.. (거의 안나옴) */
+  /** 셀모임 미참석하는 인원의 등급2 (셀장평가에 의해 결정) */
   C = 'C',
-  /** 예배출석만 하는 새싹셀 인원 */
+  /** 셀모임 미참석하는 인원의 등급3 (셀장평가에 의해 결정) */
   D = 'D',
-  /** 예배출석이 많이 뜸해진 새싹셀 인원 */
+  /** 셀미편성 인원 중 어떤 예배든지 참석하는 인원의 등급 */
   E = 'E',
-  /** 정말 더 이상 안오시는 분들 (영커플로 부서 이동, 이사, 이직 등) */
+  /** 셀미편성 인원 중 예배도 미참석하는 인원의 등급(유령회원) */
   F = 'F',
+  /** 결혼, 진급, 이사 등으로 인터치에서 제외된 인원의 등급 */
+  G = 'G',
 }
 
 export type FindChurchServicesQueryVariables = Exact<{ [key: string]: never }>
@@ -967,6 +973,10 @@ export type FindUserCellTransferRegisterQuery = {
       __typename?: 'User'
       id: string
       name: string
+      gender?: Gender | null
+      grade: UserGrade
+      birthday?: string | null
+      phone: string
       isActive: boolean
       roles: Array<RoleType>
     }>
@@ -1636,6 +1646,10 @@ export const FindUserCellTransferRegisterDocument = `
     members {
       id
       name
+      gender
+      grade
+      birthday
+      phone
       isActive
       roles
     }

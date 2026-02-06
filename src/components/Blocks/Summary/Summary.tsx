@@ -1,7 +1,7 @@
-import React from 'react'
+import SummaryButton from '@/components/Atoms/Summary/SummaryButton'
 import SummaryHeader from '@/components/Atoms/Summary/SummaryHeader'
 import SummaryRow from '@/components/Atoms/Summary/SummaryRow'
-import SummaryButton from '@/components/Atoms/Summary/SummaryButton'
+import React from 'react'
 
 type CompoundComposition = {
   Row: React.FC<{ title: string; definition: string }>
@@ -19,7 +19,7 @@ const Summary: React.FC<{
 }> &
   CompoundComposition = (props) => {
   return (
-    <section className="rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:p-8">
+    <section className="rounded-lg border px-4 py-6 lg:p-8">
       <SummaryHeader header={props.header} />
       <dl className="mt-6 space-y-4">{props.children}</dl>
       <div

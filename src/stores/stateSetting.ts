@@ -1,4 +1,3 @@
-import { Theme } from '@/types/setting'
 import { atom } from 'recoil'
 
 export const stateSetting = atom({
