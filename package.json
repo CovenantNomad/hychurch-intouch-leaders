@@ -15,7 +15,9 @@
     "test:regressions": "node --test tests/regressions.test.cjs",
     "generate": "graphql-codegen --config codegen.yaml",
     "prepare": "husky install",
-    "pre-commit": "lint-staged --no-stash"
+    "pre-commit": "lint-staged --no-stash",
+    "typecheck": "tsc --noEmit --incremental false",
+    "lint:ci": "eslint src tests public/sw.js --ext .js,.jsx,.ts,.tsx,.cjs --no-cache --max-warnings=0"
   },
   "dependencies": {
     "@graphql-codegen/cli": "^3.0.0",
@@ -33,7 +35,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@tanstack/react-query": "^4.24.4",
     "@types/lodash": "^4.14.191",
-    "@types/node": "^24.0.0",
+    "@types/node": "18.11.19",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "@types/react-query": "^1.2.9",

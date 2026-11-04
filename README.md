@@ -14,6 +14,19 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+### 자동 검증 (GitHub Actions)
+
+- `develop`에 push하거나 `master` 대상 PR을 생성·갱신·다시 열면 `.github/workflows/ci.yml`이 실행됩니다.
+- Node.js 24에서 `npm ci`로 lockfile 그대로 설치한 뒤 아래 네 검사를 실행합니다. 한 검사가 실패해도 나머지 검사 결과를 확인할 수 있으며 전체 CI는 실패로 남습니다.
+- `npm run typecheck`: TypeScript 검사
+- `npm run lint:ci`: 소스·테스트·서비스 워커 ESLint 검사 (경고도 실패)
+- `npm test`: 운영 API/DB를 사용하지 않는 자동화 테스트
+- `npm run build`: 테스트용 환경변수로 프로덕션 빌드 검증
+- CI에는 운영 Secret을 등록하지 않습니다. 빌드 산출물은 배포하지 않으며, 실제 운영 환경변수·연동 동작 검증을 대체하지 않습니다.
+- `@types/node`는 기존 lockfile과 TypeScript 4.9 검증 환경의 `18.11.19`를 유지합니다. 실행용 Node.js 24와 타입 선언 버전은 별개이며, 타입 업그레이드는 TypeScript 업그레이드와 함께 검토합니다.
+- 개발 흐름은 `develop` 작업·push → CI 확인 → `master` PR → CI 확인·리뷰 → 병합입니다. 운영 배포는 기존 Vercel의 `master` 연결을 사용합니다.
+- 병합을 강제로 차단하려면 별도로 GitHub 브랜치 보호에서 `TypeScript, ESLint, tests and build`를 필수 검사로 지정해야 합니다. 워크플로 자체는 브랜치 보호 설정을 변경하지 않습니다.
+
 ### 회귀 검사
 
 `npm test`는 PWA와 셀모임 제출·인증 초기화·로그아웃·평가서 예외·예배 ID 경계 테스트를 실행합니다.
