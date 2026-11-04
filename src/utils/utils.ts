@@ -16,8 +16,17 @@ export function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function makeErrorMessage(message: string) {
-  return message.split(':')[0]
+export function makeErrorMessage(error: unknown) {
+  const message =
+    typeof error === 'string'
+      ? error
+      : error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ? error.message
+      : ''
+  return message.split(':')[0].trim() || '알 수 없는 오류가 발생했습니다'
 }
 
 export const getTransferStatus = (state: UserCellTransferStatus) => {
@@ -44,7 +53,10 @@ export const getServiceName = (churchServiceId: string) => {
     '4부예배',
     '청년예배',
   ]
-  return churchServiceNameList[Number(churchServiceId) - 1]
+  return (
+    churchServiceNameList[Number(churchServiceId) - 1] ||
+    `미등록 예배 (${churchServiceId || 'ID 없음'})`
+  )
 }
 
 export function groupByChurchService(list: TempSavedAttendanceHistory[]) {
@@ -61,7 +73,11 @@ export function groupByChurchService(list: TempSavedAttendanceHistory[]) {
   return list.reduce((acc, cur: TempSavedAttendanceHistory) => {
     const { churchServiceId } = cur
     const index = acc.findIndex((item) => item.serviceId === churchServiceId)
-    acc[index].tempAttendanceList.push(cur)
+    if (index === -1) {
+      acc.push({ serviceId: churchServiceId, tempAttendanceList: [cur] })
+    } else {
+      acc[index].tempAttendanceList.push(cur)
+    }
     return acc
   }, init)
 }

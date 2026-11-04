@@ -40,7 +40,7 @@ const CellEvaluationFormListItem = ({
     if (data) {
       onHandleCheckSubmission(member.id, data)
     }
-  }, [data, member.id])
+  }, [data, member.id, onHandleCheckSubmission])
 
   return (
     <Link

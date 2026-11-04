@@ -16,7 +16,6 @@ import toast from 'react-hot-toast'
 const useCellDallant = () => {
   const userInfo = useRecoilValue(stateUserInfo)
   const [isLoading, setIsLoading] = useState(true)
-  const [cellId, setCellId] = useState<string>('')
   const [cellInfo, setCellInfo] = useState<DallantCellType | null>(null)
   const [cellMember, setCellMember] = useState<
     DallantCellCombinedMember[] | null
@@ -38,6 +37,13 @@ const useCellDallant = () => {
     }
   )
 
+  const cellId =
+    userInfo?.cell?.id ||
+    cellData?.myCellMembers?.find((member) =>
+      member.roles.includes(RoleType.CellLeader)
+    )?.cell?.id ||
+    ''
+
   const {
     isLoading: isDallantLoading,
     isFetching: isDallantFetching,
@@ -49,21 +55,6 @@ const useCellDallant = () => {
   })
 
   useEffect(() => {
-    if (userInfo?.cell?.id) {
-      setCellId(userInfo?.cell?.id)
-    } else if (cellData && cellData.myCellMembers) {
-      const leader = cellData.myCellMembers.find((member) =>
-        member.roles.includes(RoleType.CellLeader)
-      )
-      if (leader?.cell?.id) {
-        setCellId(leader.cell.id)
-      }
-    } else {
-      setCellId('')
-    }
-  }, [])
-
-  useEffect(() => {
     if (
       !isCellLoading &&
       !isDallantLoading &&
@@ -72,7 +63,12 @@ const useCellDallant = () => {
     ) {
       const loadCellDallant = async () => {
         try {
-          if (cellData && cellData.myCellMembers && dallantData) {
+          if (
+            cellData &&
+            cellData.myCellMembers &&
+            dallantData &&
+            dallantData.cellId === cellId
+          ) {
             const combinedMembers = cellData.myCellMembers.map((cellMember) => {
               const matchingMember = dallantData.members.find(
                 (dallantMember) => cellMember.id === dallantMember.userId
@@ -95,11 +91,13 @@ const useCellDallant = () => {
             })
             setCellMember(combinedMembers)
           } else {
+            setCellInfo(null)
             setCellMember(null)
           }
         } catch (error) {
           console.error('@loadCellDallant Error: ', error)
           toast.error(`데이터를 불러오는 중에 에러가 발생하였습니다`)
+          setCellInfo(null)
           setCellMember(null)
         }
       }
@@ -121,8 +119,8 @@ const useCellDallant = () => {
 
   return {
     isLoading,
-    cellInfo,
-    cellMember,
+    cellInfo: cellInfo?.cellId === cellId ? cellInfo : null,
+    cellMember: cellInfo?.cellId === cellId ? cellMember : null,
   }
 }
 

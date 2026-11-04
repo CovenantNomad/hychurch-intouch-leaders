@@ -1,5 +1,7 @@
 import '../styles/globals.css'
 import React from 'react'
+import Head from 'next/head'
+import PwaRegistration from '@/components/Templates/RootApp/PwaRegistration'
 import type { AppProps } from 'next/app'
 import { RecoilRoot } from 'recoil'
 import { Toaster } from 'react-hot-toast'
@@ -18,6 +20,11 @@ const queryClient = new QueryClient({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#3b82f6" />
+      </Head>
+      <PwaRegistration />
       <RecoilRoot>
         <QueryClientProvider client={queryClient}>
           <RootApp>

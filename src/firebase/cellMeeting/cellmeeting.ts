@@ -4,8 +4,9 @@ import {
   TCellMeetingSubmissionDataForCell,
   TCellMeetingSubmissionDataForMember,
 } from '@/types/cellMeeting'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, runTransaction } from 'firebase/firestore'
 import toast from 'react-hot-toast'
+import { makeErrorMessage } from '@/utils/utils'
 
 export const getCellMeetingSubmissionStatus = async (
   cellId: string,
@@ -36,9 +37,9 @@ export const getCellMeetingSubmissionStatus = async (
           cellMeetingDoc.data() as TCellMeetingSubmissionDataForCell,
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error)
-    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+    toast.error(`에러가 발생하였습니다\n${makeErrorMessage(error)}`)
   }
 }
 
@@ -55,59 +56,47 @@ export const onSaveCellMeeting = async ({
   submitDataForMember: TCellMeetingSubmissionDataForMember[]
   submitDataForAbsentMember: TCellMeetingSubmissionDataForMember[]
 }) => {
-  try {
-    for (const memberData of submitDataForMember) {
-      const memberDocRef = doc(
-        db,
-        CELLMEETING_COLLCTION.CELLMEETINGS,
-        CELLMEETING_COLLCTION.DATA,
-        CELLMEETING_COLLCTION.MEMBERLIST,
-        memberData.userId,
-        CELLMEETING_COLLCTION.HISTORY,
-        baseDateString
-      )
-
-      const memberDoc = await getDoc(memberDocRef)
-
-      if (!memberDoc.exists()) {
-        await setDoc(memberDocRef, memberData)
-      }
-    }
-
-    for (const memberData of submitDataForAbsentMember) {
-      const memberDocRef = doc(
-        db,
-        CELLMEETING_COLLCTION.CELLMEETINGS,
-        CELLMEETING_COLLCTION.DATA,
-        CELLMEETING_COLLCTION.MEMBERLIST,
-        memberData.userId,
-        CELLMEETING_COLLCTION.HISTORY,
-        baseDateString
-      )
-
-      const memberDoc = await getDoc(memberDocRef)
-
-      if (!memberDoc.exists()) {
-        await setDoc(memberDocRef, memberData)
-      }
-    }
-
-    const cellDocRef = doc(
-      db,
-      CELLMEETING_COLLCTION.CELLMEETINGS,
-      CELLMEETING_COLLCTION.DATA,
-      CELLMEETING_COLLCTION.CELLLIST,
-      cellId,
-      CELLMEETING_COLLCTION.CELLHISTORY,
-      baseDateString
-    )
-    const cellDoc = await getDoc(cellDocRef)
-
-    if (!cellDoc.exists()) {
-      await setDoc(cellDocRef, submitDataForCell)
-    }
-  } catch (error: any) {
-    console.error(error)
-    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+  const members = [...submitDataForMember, ...submitDataForAbsentMember]
+  if (!cellId || !baseDateString || members.length === 0) {
+    throw new Error('셀과 출석 명단을 확인해주세요')
   }
+  if (new Set(members.map((member) => member.userId)).size !== members.length) {
+    throw new Error('출석 명단에 중복된 셀원이 있습니다')
+  }
+  const cellDocRef = doc(
+    db,
+    CELLMEETING_COLLCTION.CELLMEETINGS,
+    CELLMEETING_COLLCTION.DATA,
+    CELLMEETING_COLLCTION.CELLLIST,
+    cellId,
+    CELLMEETING_COLLCTION.CELLHISTORY,
+    baseDateString
+  )
+
+  // All reads precede writes; failure leaves every document unchanged.
+  await runTransaction(db, async (transaction) => {
+    const cellDoc = await transaction.get(cellDocRef)
+    if (cellDoc.exists()) {
+      throw new Error('이미 제출된 셀모임 출석입니다. 새로고침 후 확인해주세요')
+    }
+    const memberRefs = members.map((member) =>
+      doc(
+        db,
+        CELLMEETING_COLLCTION.CELLMEETINGS,
+        CELLMEETING_COLLCTION.DATA,
+        CELLMEETING_COLLCTION.MEMBERLIST,
+        member.userId,
+        CELLMEETING_COLLCTION.HISTORY,
+        baseDateString
+      )
+    )
+    const memberDocs = await Promise.all(
+      memberRefs.map((ref) => transaction.get(ref))
+    )
+    memberRefs.forEach((ref, index) => {
+      // Preserve the existing policy: do not overwrite prior individual records.
+      if (!memberDocs[index].exists()) transaction.set(ref, members[index])
+    })
+    transaction.set(cellDocRef, submitDataForCell)
+  })
 }

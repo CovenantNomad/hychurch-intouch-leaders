@@ -16,6 +16,7 @@ import {
   setDoc,
 } from 'firebase/firestore'
 import toast from 'react-hot-toast'
+import { makeErrorMessage } from '@/utils/utils'
 
 // 셀평가서 전체세팅 가져오기
 export const getEvalutationSettings = async () => {
@@ -33,9 +34,9 @@ export const getEvalutationSettings = async () => {
     } else {
       return settingDoc.data() as EvaluationSettingType
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
-    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
+    toast.error(`에러가 발생하였습니다\n${makeErrorMessage(error)}`)
     return null
   }
 }
@@ -63,7 +64,7 @@ export const getIndividaulSubmissionStatus = async ({
     } else {
       return IndividualSubmissionCheckType.SAVED
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
     toast.error(`에러! 셀원정보를 읽어오지 못했습니다`)
     return null
@@ -96,7 +97,7 @@ export const getCellSubmissionStatus = async ({
     } else {
       return cellDoc.data() as CellEvaluationSubmissionType
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
     toast.error(`에러! 셀원정보를 읽어오지 못했습니다`)
     return null
@@ -126,7 +127,7 @@ export const getIndividaulEvaluationSubmission = async ({
     } else {
       return memberDoc.data() as IndividualEvaluationDataType
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
     toast.error(`에러! 셀원정보를 읽어오지 못했습니다`)
     return null
@@ -147,7 +148,7 @@ export const createIndividaulEvaluation = async (
       const settingDoc = await transaction.get(settingRef)
 
       if (!settingDoc.exists() || !settingDoc.data().isActive) {
-        throw '세팅이 설정되지 않았습니다'
+        throw new Error('세팅이 설정되지 않았습니다')
       } else {
         const settingData = settingDoc.data() as EvaluationSettingType
 
@@ -178,10 +179,9 @@ export const createIndividaulEvaluation = async (
         }
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
-    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
-    return null
+    throw new Error(makeErrorMessage(error))
   }
 }
 
@@ -201,7 +201,7 @@ export const createCellEvaluationFormFinalSubmission = async ({
       const settingDoc = await transaction.get(settingRef)
 
       if (!settingDoc.exists() || !settingDoc.data().isActive) {
-        throw '세팅이 설정되지 않았습니다'
+        throw new Error('세팅이 설정되지 않았습니다')
       } else {
         const settingData = settingDoc.data() as EvaluationSettingType
 
@@ -214,6 +214,11 @@ export const createCellEvaluationFormFinalSubmission = async ({
         )
         const cellDoc = await transaction.get(cellDocRef)
 
+        if (!cellDoc.exists()) {
+          throw new Error(
+            '저장된 셀원정보가 없습니다. 먼저 셀원정보를 저장해주세요'
+          )
+        }
         if (cellDoc.exists()) {
           transaction.update(cellDocRef, {
             submissionStatus: EvaluationSubmissionStatus.COMPLETE,
@@ -222,9 +227,8 @@ export const createCellEvaluationFormFinalSubmission = async ({
         }
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('@getCellMeeting Error: ', error)
-    toast.error(`에러가 발생하였습니다\n${error.message.split(':')[0]}`)
-    return null
+    throw new Error(makeErrorMessage(error))
   }
 }

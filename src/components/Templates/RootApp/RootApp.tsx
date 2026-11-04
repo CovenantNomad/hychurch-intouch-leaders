@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import SplashScreen from '../SplashScreen/SplashScreen'
 
 interface RootAppProps {
@@ -8,8 +8,10 @@ interface RootAppProps {
 const RootApp = ({ children }: RootAppProps) => {
   const [initialized, setInitialized] = useState(false)
 
+  const onFinished = useCallback(() => setInitialized(true), [])
+
   if (!initialized) {
-    return <SplashScreen onFinished={() => setInitialized(true)} />
+    return <SplashScreen onFinished={onFinished} />
   }
   return <div>{children}</div>
 }

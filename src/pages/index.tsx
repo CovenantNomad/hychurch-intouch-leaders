@@ -1,8 +1,8 @@
 import Head from 'next/head'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { toast } from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
-import { GraphQLError } from 'graphql'
 import { MeDocument, useLoginMutation } from '@/graphql/generated'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
 import { LoginForm } from '@/types/auth'
@@ -13,34 +13,42 @@ import { INTOUCH_LEADERS_ACCESS_TOKEN } from '@/constants/constants'
 
 export default function Login() {
   const router = useRouter()
-  const { setUserInfo } = useAuth()
+  const { setUserInfo, clearSession } = useAuth()
+  const loginPending = useRef(false)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
 
   const { mutate, isLoading } = useLoginMutation(graphlqlRequestClient, {
     onSuccess: async (data) => {
-      const token = JSON.stringify({ accessToken: data.login.accessToken })
-      localStorage.setItem(INTOUCH_LEADERS_ACCESS_TOKEN, token)
-      graphlqlRequestClient.setHeader('authorization', data.login.accessToken)
       try {
+        const accessToken = data.login.accessToken
+        if (!accessToken?.trim()) throw new Error('로그인 토큰이 없습니다')
+        graphlqlRequestClient.setHeader('authorization', accessToken)
         const result = await graphlqlRequestClient.request(MeDocument)
-
-        if (result !== undefined) {
-          setUserInfo({
-            id: result.me.id,
-            name: result.me.name,
-            cell: result.me.cell,
-            roles: result.me.roles,
-          })
-        } else {
-          setUserInfo(null)
-        }
-      } catch (errors) {
-        console.log('@Login: ', errors)
+        if (!result?.me) throw new Error('사용자 정보를 확인할 수 없습니다')
+        localStorage.setItem(
+          INTOUCH_LEADERS_ACCESS_TOKEN,
+          JSON.stringify({ accessToken })
+        )
+        setUserInfo({
+          id: result.me.id,
+          name: result.me.name,
+          cell: result.me.cell,
+          roles: result.me.roles,
+        })
+        await router.replace('/home')
+      } catch {
+        clearSession()
+        toast.error('사용자 정보를 확인하지 못했습니다. 다시 로그인해주세요.')
       } finally {
-        router.push('/home')
+        loginPending.current = false
+        setIsAuthenticating(false)
       }
     },
-    onError(errors: GraphQLError) {
-      toast.error(`로그인에 실패했습니다.`)
+    onError() {
+      clearSession()
+      loginPending.current = false
+      setIsAuthenticating(false)
+      toast.error('로그인에 실패했습니다.')
     },
   })
 
@@ -51,6 +59,10 @@ export default function Login() {
   } = useForm<LoginForm>()
 
   const onSubmitHandler = ({ phone, password }: LoginForm) => {
+    if (loginPending.current) return
+    loginPending.current = true
+    setIsAuthenticating(true)
+    clearSession()
     mutate({
       input: {
         phone,
@@ -124,9 +136,10 @@ export default function Login() {
           <div className="pt-4">
             <button
               type="submit"
+              disabled={isLoading || isAuthenticating}
               className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white hover:bg-blue-600 bg-blue-500/90"
             >
-              {isLoading ? <Spinner /> : 'LOGIN'}
+              {isLoading || isAuthenticating ? <Spinner /> : 'LOGIN'}
             </button>
           </div>
         </form>

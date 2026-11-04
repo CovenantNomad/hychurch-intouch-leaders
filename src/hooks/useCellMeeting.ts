@@ -13,9 +13,10 @@ import {
   TCellMeetingSubmissionDataForCell,
   TCellMeetingSubmissionDataForMember,
 } from '@/types/cellMeeting'
+import { makeErrorMessage } from '@/utils/utils'
 import { getMostRecentSunday } from '@/utils/dateUtils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useRecoilState } from 'recoil'
 
@@ -38,6 +39,7 @@ const useCellMeeting = ({ cellId, cellName }: useCellMeetingProps) => {
   const [isCellMeetingSubmissionLoading, setIsCellMeetingSubmissionLoading] =
     useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const submittingRef = useRef(false)
 
   const {
     isLoading: isCellMemberLoading,
@@ -154,6 +156,29 @@ const useCellMeeting = ({ cellId, cellName }: useCellMeetingProps) => {
   }
 
   const onSaveHandler = async () => {
+    if (submittingRef.current) return
+    if (!cellId || !cellName || !cellMember?.myCellMembers?.length) {
+      toast.error('셀과 셀원 정보를 불러온 뒤 다시 제출해주세요')
+      return
+    }
+    const currentMembers = cellMember.myCellMembers
+    const selected = cellMeetingAttendance.tempAttendanceList
+    if (!selected?.length) {
+      toast.error('출석체크 인원이 없습니다')
+      return
+    }
+    if (
+      selected.some(
+        (member) =>
+          member.cellId !== cellId ||
+          member.baseDateString !== baseDateString ||
+          !currentMembers.some((current) => current.id === member.userId)
+      )
+    ) {
+      toast.error('출석 명단이 현재 셀 또는 날짜와 다릅니다. 다시 체크해주세요')
+      return
+    }
+    submittingRef.current = true
     try {
       setIsSubmitting(true)
       if (
@@ -201,7 +226,7 @@ const useCellMeeting = ({ cellId, cellName }: useCellMeetingProps) => {
               }
             })
 
-          mutation.mutateAsync({
+          await mutation.mutateAsync({
             cellId,
             baseDateString,
             submitDataForCell,
@@ -214,8 +239,9 @@ const useCellMeeting = ({ cellId, cellName }: useCellMeetingProps) => {
       toast.success('셀모임 출석체크 제출 완료하였습니다')
     } catch (error) {
       console.error('@cellMeeting-onSaveHandler: ', error)
-      toast.error('제출에 실패하였습니다')
+      toast.error(makeErrorMessage(error))
     } finally {
+      submittingRef.current = false
       setIsSubmitting(false)
     }
   }

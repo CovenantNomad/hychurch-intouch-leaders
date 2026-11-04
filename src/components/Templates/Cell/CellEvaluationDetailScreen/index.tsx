@@ -110,9 +110,10 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
     },
   })
 
-  const onCalcNewGrade = () => {
-    const worship = watch('worship')
+  const worship = watch('worship')
+  const meeting = watch('meeting')
 
+  useEffect(() => {
     switch (worship) {
       case WORSHIP_TYPE.ABSENT:
         setNewGrade(UserGrade.D)
@@ -123,7 +124,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
         break
 
       case WORSHIP_TYPE.INTOUCH_OFFLINE:
-        if (watch('meeting') === MEETING_GRADE.THIRD) {
+        if (meeting === MEETING_GRADE.THIRD) {
           setNewGrade(UserGrade.B)
         } else {
           setNewGrade(UserGrade.A)
@@ -131,7 +132,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
         break
 
       case WORSHIP_TYPE.INTOUCH_ONLINE:
-        if (watch('meeting') === MEETING_GRADE.THIRD) {
+        if (meeting === MEETING_GRADE.THIRD) {
           setNewGrade(UserGrade.B)
         } else {
           setNewGrade(UserGrade.A)
@@ -141,7 +142,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
       default:
         break
     }
-  }
+  }, [worship, meeting])
 
   const onSubmitHandler = (data: EvaluationFormInputType) => {
     if (memberInfo) {
@@ -160,7 +161,7 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
         },
       })
 
-      mutation.mutateAsync({
+      mutation.mutate({
         userId: id ? String(id) : memberInfo.user.id,
         userName: userName ? String(userName) : memberInfo.user.name,
         previousCellId: cellId ? String(cellId) : memberInfo.user.cell!.id,
@@ -173,10 +174,6 @@ const CellEvaluationDetailScreen = ({}: CellEvaluationDetailScreenProps) => {
       })
     }
   }
-
-  useEffect(() => {
-    onCalcNewGrade()
-  }, [watch('worship'), watch('meeting')])
 
   useEffect(() => {
     if (data) {

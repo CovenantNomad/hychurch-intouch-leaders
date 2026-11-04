@@ -5,7 +5,7 @@ import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 type CellEvaluationFormSubmissionModalProps = {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  actionHandler: () => Promise<null | undefined>
+  actionHandler: () => void
 }
 
 const CellEvaluationFormSubmissionModal = ({

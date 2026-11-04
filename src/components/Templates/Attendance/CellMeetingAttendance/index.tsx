@@ -40,14 +40,14 @@ const CellMeetingAttendance = ({ userInfo }: CellMeetingAttendanceProps) => {
     onCheckHandler,
     onSaveHandler,
   } = useCellMeeting({
-    cellId: String(userInfo?.cell?.id),
-    cellName: String(userInfo?.cell?.name),
+    cellId: userInfo?.cell?.id || '',
+    cellName: userInfo?.cell?.name || '',
   })
 
   const router = useRouter()
   const onCloseHandler = useCallback(() => {
     router.push('/home')
-  }, [])
+  }, [router])
 
   return (
     <div>
@@ -156,6 +156,7 @@ const CellMeetingAttendance = ({ userInfo }: CellMeetingAttendanceProps) => {
                         <AlertDialog>
                           <AlertDialogTrigger
                             disabled={
+                              isSubmitting ||
                               cellMeetingAttendance.tempAttendanceList ===
                                 null ||
                               cellMeetingAttendance.tempAttendanceList
@@ -176,7 +177,10 @@ const CellMeetingAttendance = ({ userInfo }: CellMeetingAttendanceProps) => {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>취소</AlertDialogCancel>
-                              <AlertDialogAction onClick={onSaveHandler}>
+                              <AlertDialogAction
+                                disabled={isSubmitting}
+                                onClick={onSaveHandler}
+                              >
                                 {isSubmitting ? '제출 중...' : '제출'}
                               </AlertDialogAction>
                             </AlertDialogFooter>

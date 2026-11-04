@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "인터치 리더스 | INTOUCH LEADERS",
+  "short_name": "인터치 리더스",
+  "description": "슬기로운 리더생활을 위한 Intouch Leaders",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/images/shortcut-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -8,16 +8,23 @@ import { getTodayString } from '@/utils/dateUtils'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useCallback } from 'react'
+import { cellDayCartState } from '@/stores/cellDayCartState'
+import { cellDayOrderState } from '@/stores/cellDayOrderState'
+import { stateSetting } from '@/stores/stateSetting'
+import { useRecoilState, useSetRecoilState, useResetRecoilState } from 'recoil'
 
 export const useAuth = () => {
   const [userInfo, setUserInfo] = useRecoilState(stateUserInfo)
   const setAttendance = useSetRecoilState(attendanceState)
   const setCellMeeting = useSetRecoilState(cellMeetingState)
+  const resetCart = useResetRecoilState(cellDayCartState)
+  const resetOrder = useResetRecoilState(cellDayOrderState)
+  const resetSetting = useResetRecoilState(stateSetting)
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const onLogOutHandler = () => {
+  const clearSession = useCallback(() => {
     queryClient.clear()
     setCellMeeting({
       tempAttendanceList: null,
@@ -31,15 +38,38 @@ export const useAuth = () => {
       tempAttendanceList: null,
       attendanceList: null,
     })
-    localStorage.removeItem(INTOUCH_LEADERS_ACCESS_TOKEN)
+    resetCart()
+    resetOrder()
+    resetSetting()
+    try {
+      localStorage.removeItem(INTOUCH_LEADERS_ACCESS_TOKEN)
+    } catch {
+      // In-memory state must still be cleared when browser storage is blocked.
+      console.error('브라우저의 로그인 저장 정보를 삭제하지 못했습니다.')
+    }
     graphlqlRequestClient.setHeader('authorization', '')
     setUserInfo(null)
-    router.push('/')
+  }, [
+    queryClient,
+    setCellMeeting,
+    setAttendance,
+    resetCart,
+    resetOrder,
+    resetSetting,
+    setUserInfo,
+  ])
+
+  const onLogOutHandler = () => {
+    clearSession()
+    void router.replace('/').catch(() => {
+      window.location.replace('/')
+    })
   }
 
   return {
     userInfo,
     setUserInfo,
     onLogOutHandler,
+    clearSession,
   }
 }

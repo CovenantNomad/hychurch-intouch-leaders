@@ -34,7 +34,6 @@ type CellEvaluationFormEntryHeaderProps = {
 const CellEvaluationFormEntryHeader = ({
   isLoading,
   isActive,
-  today,
   entryStartDate,
   entryEndDate,
   statusCode,
@@ -50,7 +49,7 @@ const CellEvaluationFormEntryHeader = ({
     if (entryStartDate && entryEndDate) {
       entryTimer = setInterval(() => {
         updateEntryCountdown({
-          currentDate: today,
+          currentDate: dayjs(),
           startDate: entryStartDate,
           targetDate: entryEndDate,
         })
@@ -62,7 +61,7 @@ const CellEvaluationFormEntryHeader = ({
         clearInterval(entryTimer)
       }
     }
-  }, [entryStartDate, entryEndDate, today])
+  }, [entryStartDate, entryEndDate, updateEntryCountdown])
 
   return (
     <div>

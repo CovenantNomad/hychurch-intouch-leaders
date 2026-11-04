@@ -2,7 +2,7 @@ import EmptyStateSimple from '@/components/Atoms/EmptyStates/EmptyStateSimple'
 import Skeleton from '@/components/Atoms/Skeleton'
 import { RoleType } from '@/graphql/generated'
 import { useFindCellMembers } from '@/hooks/useFindCellMembers'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import CellEvaluationFormListItem from './CellEvaluationFormListItem'
 import {
   EvaluationSubmissionStatus,
@@ -36,17 +36,23 @@ const CellEvaluationFormList = ({
 
   const [open, setOpen] = useState(false)
 
-  const [allDataStatus, setAllDataStatus] = useState({})
+  const [allDataStatus, setAllDataStatus] = useState<
+    Record<string, IndividualSubmissionCheckType>
+  >({})
 
-  const handleCheckSubmission = (
-    memberId: string,
-    value: IndividualSubmissionCheckType
-  ) => {
-    setAllDataStatus((prevState) => ({
-      ...prevState,
-      [memberId]: value,
-    }))
-  }
+  const handleCheckSubmission = useCallback(
+    (memberId: string, value: IndividualSubmissionCheckType) => {
+      setAllDataStatus((prevState) =>
+        prevState[memberId] === value
+          ? prevState
+          : {
+              ...prevState,
+              [memberId]: value,
+            }
+      )
+    },
+    []
+  )
 
   const isAllSaved = Object.values(allDataStatus).every(
     (value) => value === IndividualSubmissionCheckType.SAVED
@@ -147,7 +153,7 @@ const CellEvaluationFormList = ({
         open={open}
         setOpen={setOpen}
         actionHandler={() =>
-          mutation.mutateAsync({
+          mutation.mutate({
             cellId: userInfo!.cell!.id,
           })
         }

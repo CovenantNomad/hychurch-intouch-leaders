@@ -56,40 +56,37 @@ const useAttendance = () => {
   })
 
   useEffect(() => {
-    if (!isLoading) {
-      switch (data?.myCellAttendance.__typename) {
+    const result = data?.myCellAttendance
+    if (isLoading || !result) return
+
+    setAttendance((previous) => {
+      switch (result.__typename) {
         case 'CellAttendanceNotSubmitted':
-          setAttendance({
-            ...attendance,
+          return {
+            ...previous,
             status: AttendanceStatus.NOT_SUBMITTED,
             tempAttendanceList: null,
             attendanceList: null,
-          })
-          break
+          }
         case 'CellAttendanceTempSaved':
-          setAttendance({
-            ...attendance,
+          return {
+            ...previous,
             status: AttendanceStatus.TEMPORARY_SAVE,
-            tempAttendanceList:
-              data.myCellAttendance.tempSavedAttendanceHistories,
+            tempAttendanceList: result.tempSavedAttendanceHistories,
             attendanceList: null,
-          })
-          break
-
+          }
         case 'CellAttendanceCompleted':
-          setAttendance({
-            ...attendance,
+          return {
+            ...previous,
             status: AttendanceStatus.COMPLETE,
             tempAttendanceList: null,
-            attendanceList: data.myCellAttendance.userChurchServiceHistories,
-          })
-          break
-
+            attendanceList: result.userChurchServiceHistories,
+          }
         default:
-          break
+          return previous
       }
-    }
-  }, [data])
+    })
+  }, [data, isLoading, setAttendance])
 
   const onCheckHandler = ({
     checked,

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#3b82f6" />
+    <title>인터넷 연결 확인 | 인터치 리더스</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #eff6ff; color: #111827; font-family: system-ui, sans-serif; }
+      main { width: 100%; max-width: 420px; padding: 32px 24px; border-radius: 24px; background: white; text-align: center; }
+      img { width: 80px; height: 80px; }
+      h1 { margin: 24px 0 16px; font-size: 24px; }
+      p { color: #4b5563; line-height: 1.8; word-break: keep-all; }
+      button { width: 100%; margin-top: 16px; padding: 14px; border: 0; border-radius: 12px; background: #2563eb; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+      button:focus-visible, a:focus-visible { outline: 3px solid #111827; outline-offset: 4px; }
+      a { display: inline-block; margin-top: 20px; color: #2563eb; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/images/shortcut-icon.png" alt="인터치" width="80" height="80" />
+      <h1>인터넷 연결을 확인해주세요</h1>
+      <p>지금은 페이지를 불러올 수 없습니다.<br />출석체크와 주문은 인터넷에 연결한 뒤 이용해주세요.</p>
+      <p>연결이 끊기기 전에 제출했다면, 다시 제출하기 전에 저장 결과를 확인해주세요.</p>
+      <button type="button" onclick="window.location.reload()">다시 시도</button>
+      <a href="/">로그인 화면으로 이동</a>
+    </main>
+  </body>
+</html>

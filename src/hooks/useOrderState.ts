@@ -1,48 +1,40 @@
 import { getOrderStatement } from '@/firebase/dallant/cellday'
 import { cellDayOrderState } from '@/stores/cellDayOrderState'
 import { stateUserInfo } from '@/stores/stateUserInfo'
+import { OrderStatus } from '@/types/cellday'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
 const useOrderState = () => {
   const userInfo = useRecoilValue(stateUserInfo)
+  const cellId = userInfo?.cell?.id || ''
   const [orderState, setOrderState] = useRecoilState(cellDayOrderState)
   const { isLoading, isFetching, data } = useQuery(
-    ['getOrderStatement', orderState.cellId],
-    () => getOrderStatement(orderState.cellId),
+    ['getOrderStatement', cellId],
+    () => getOrderStatement(cellId),
     {
-      enabled: Boolean(orderState.cellId !== ''),
+      enabled: Boolean(cellId),
       staleTime: 15 * 60 * 1000,
       cacheTime: 30 * 60 * 1000,
     }
   )
 
   useEffect(() => {
-    if (userInfo && userInfo.cell) {
-      setOrderState({
-        ...orderState,
-        cellId: userInfo.cell.id,
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (data) {
-      setOrderState({
-        ...orderState,
-        orderStatus: data.orderStatus,
-        orderNumber: data.orderNumber,
-        orderDocument: data.orderDocument,
-        orderTime: data.orderTime,
-      })
-    }
-  }, [data])
+    setOrderState(
+      data?.cellId === cellId && cellId
+        ? data
+        : { cellId, orderStatus: OrderStatus.NOT_SUBMITTED }
+    )
+  }, [cellId, data, setOrderState])
 
   return {
     isLoading,
     isFetching,
-    orderState,
+    orderState:
+      orderState.cellId === cellId
+        ? orderState
+        : { cellId, orderStatus: OrderStatus.NOT_SUBMITTED },
   }
 }
 

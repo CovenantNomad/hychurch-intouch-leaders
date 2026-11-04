@@ -2,9 +2,8 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAuth } from '@/hooks/useAuth'
 import { INTOUCH_LEADERS_ACCESS_TOKEN } from '@/constants/constants'
-import Layout from '@components/Atoms/Layout/Layout'
-import Container from '@components/Atoms/Container/Container'
 import graphlqlRequestClient from '@/client/graphqlRequestClient'
+import { parseStoredAccessToken } from '@/utils/authSession'
 import { MeDocument } from '@/graphql/generated'
 
 interface SplashScreenProps {
@@ -13,50 +12,59 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onFinished }: SplashScreenProps) => {
   const router = useRouter()
-  const { setUserInfo } = useAuth()
-
-  const init = async () => {
-    try {
-      const token = localStorage.getItem(INTOUCH_LEADERS_ACCESS_TOKEN)
-      if (token) {
-        console.log('refresh')
-        const userInfo = JSON.parse(token)
-        graphlqlRequestClient.setHeader('authorization', userInfo.accessToken)
-        const result = await graphlqlRequestClient.request(MeDocument)
-        if (result !== undefined) {
-          setUserInfo({
-            id: result.me.id,
-            name: result.me.name,
-            cell: result.me.cell,
-            roles: result.me.roles,
-          })
-        }
-        if (router.asPath === '/') {
-          router.push('/home')
-        }
-      } else {
-        setUserInfo(null)
-        router.push('/')
-      }
-    } finally {
-      onFinished()
-    }
-  }
+  const { setUserInfo, clearSession } = useAuth()
 
   useEffect(() => {
-    init()
-  }, [])
+    if (!router.isReady) return
+    let active = true
+
+    const init = async () => {
+      try {
+        const token = parseStoredAccessToken(
+          localStorage.getItem(INTOUCH_LEADERS_ACCESS_TOKEN)
+        )
+        if (!token) throw new Error('로그인 정보가 없습니다')
+        graphlqlRequestClient.setHeader('authorization', token)
+        const result = await graphlqlRequestClient.request(MeDocument)
+        if (!active) return
+        if (!result?.me) throw new Error('사용자 정보를 확인할 수 없습니다')
+        setUserInfo({
+          id: result.me.id,
+          name: result.me.name,
+          cell: result.me.cell,
+          roles: result.me.roles,
+        })
+        if (router.asPath === '/') await router.replace('/home')
+      } catch {
+        if (!active) return
+        clearSession()
+        try {
+          if (router.asPath !== '/') await router.replace('/')
+        } catch {
+          window.location.replace('/')
+          return
+        }
+      } finally {
+        if (active) onFinished()
+      }
+    }
+
+    void init()
+    return () => {
+      active = false
+    }
+  }, [router, router.isReady, setUserInfo, clearSession, onFinished])
 
   return (
-    <Layout>
-      <Container>
-        <div className="flex items-center justify-center h-screen">
-          <p className="text-black font-bold text-sm">
-            SHALOM IN<strong className="text-xl">✝︎</strong>OUCH
-          </p>
-        </div>
-      </Container>
-    </Layout>
+    <main
+      className="flex min-h-screen items-center justify-center"
+      role="status"
+      aria-label="로그인 확인 중"
+    >
+      <p className="text-black font-bold text-sm">
+        SHALOM IN<strong className="text-xl">✝︎</strong>OUCH
+      </p>
+    </main>
   )
 }
 

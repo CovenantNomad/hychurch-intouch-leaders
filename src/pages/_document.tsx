@@ -2,10 +2,14 @@ import { Html, Head, Main, NextScript } from 'next/document'
 
 export default function Document() {
   return (
-    <Html lang="en" className="font-notosans">
+    <Html lang="ko" className="font-notosans">
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="인터치 리더스" />
         <link rel="shortcut icon" href="/images/shortcut-icon.png" />
         <meta property="title" content="INTOUCH LEADERS" />
         <meta
@@ -23,10 +27,6 @@ export default function Document() {
         />
         <meta property="og:image" content="/images/thumbnail.png" />
         <meta name="twitter:image" content="/images/thumbnail.png" />
-        <meta
-          name="viewport"
-          content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width"
-        />
       </Head>
       <body>
         <Main />

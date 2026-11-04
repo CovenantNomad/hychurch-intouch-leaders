@@ -24,7 +24,7 @@ const AttendanceComplete = ({ attendance }: AttendanceCompleteProps) => {
 
   const onCloseHandler = useCallback(() => {
     router.push('/home')
-  }, [])
+  }, [router])
 
   const groupAttendanceByService = (
     attendanceList: AttendanceHistory[] | null
