@@ -5,12 +5,12 @@ export default function Document() {
     <Html lang="ko" className="font-notosans">
       <Head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/images/apple-touch-icon-v2.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="인터치 리더스" />
-        <link rel="shortcut icon" href="/images/shortcut-icon.png" />
+        <link rel="shortcut icon" href="/images/pwa-icon-192-v2.png" />
         <meta property="title" content="INTOUCH LEADERS" />
         <meta
           name="description"

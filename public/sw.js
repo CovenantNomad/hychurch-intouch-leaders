@@ -2,13 +2,13 @@
 
 // Increment this version when changing the offline page or precached icons.
 const CACHE_PREFIX = 'intouch-leaders-pwa-'
-const CACHE_NAME = `${CACHE_PREFIX}v1`
+const CACHE_NAME = `${CACHE_PREFIX}v2`
 const OFFLINE_URL = '/offline.html'
 const PUBLIC_ASSETS = [
   OFFLINE_URL,
-  '/images/shortcut-icon.png',
-  '/images/pwa-icon-512.png',
-  '/images/apple-touch-icon.png',
+  '/images/pwa-icon-192-v2.png',
+  '/images/pwa-icon-512-v2.png',
+  '/images/apple-touch-icon-v2.png',
 ]
 
 self.addEventListener('install', (event) => {

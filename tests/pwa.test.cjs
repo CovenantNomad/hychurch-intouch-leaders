@@ -45,6 +45,7 @@ function worker({ offline = false, missingFallback = false } = {}) {
       keys: async () => [
         'intouch-leaders-pwa-v0',
         'intouch-leaders-pwa-v1',
+        'intouch-leaders-pwa-v2',
         'other-app',
       ],
       delete: async (key) => {
@@ -106,9 +107,9 @@ test('installation precaches only public offline assets', async () => {
     calls.precache.map((request) => new URL(request.url).pathname),
     [
       '/offline.html',
-      '/images/shortcut-icon.png',
-      '/images/pwa-icon-512.png',
-      '/images/apple-touch-icon.png',
+      '/images/pwa-icon-192-v2.png',
+      '/images/pwa-icon-512-v2.png',
+      '/images/apple-touch-icon-v2.png',
     ]
   )
   assert.ok(calls.precache.every((request) => request.cache === 'reload'))
@@ -123,7 +124,7 @@ test('activation removes only this app’s obsolete caches', async () => {
     },
   })
   await done
-  assert.deepEqual(calls.deleted, ['intouch-leaders-pwa-v0'])
+  assert.deepEqual(calls.deleted, ['intouch-leaders-pwa-v0', 'intouch-leaders-pwa-v1'])
   assert.equal(calls.claimed, true)
 })
 
